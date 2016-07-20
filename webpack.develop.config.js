@@ -54,7 +54,7 @@ module.exports = {
         loader: "file?[name].[ext]"
       },
       {
-        test: /react-highlight\.js\/(.*)\.js$/,
+        test: /react-highlight\.js\/dist\/main\.js$/,
         loader: 'source-map'
       },
       // {
