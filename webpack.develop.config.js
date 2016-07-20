@@ -53,6 +53,10 @@ module.exports = {
         exclude: /(node_modules|bower_components)/,
         loader: "file?[name].[ext]"
       },
+      {
+        test: /react-highlight\.js\/(.*)\.js$/,
+        loader: 'source-map'
+      },
       // {
       //   // remove the source-map urls from the rxjs library.
       //   test: /rxjs\/(.*)\.js$/,
