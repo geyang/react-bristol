@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import autobind from 'autobind-decorator';
+import Canvas from './Canvas';
 import {Flex, FlexItem} from 'layout-components';
 
 var {func, bool, string, oneOf} = PropTypes;
@@ -18,13 +19,17 @@ export default class HappySandwichMaker extends Component {
   }
 
   @autobind
-  genericHandler(e) {
-    const {type, touches} = e;
-    let pressure;
-    if (touches && touches.length >= 1 && typeof touches[0].pressure !== 'undefined') {
-      pressure = touches[0].pressure;
+  genericHandler(event) {
+    const {type, touches} = event;
+    let force, x, y;
+    if (touches && touches.length >= 1 && typeof touches[0].force !== 'undefined') {
+      force = touches[0].force;
+      ({clientX: x, clientY: y} = touches[0]);
+    } else if (type.match(/^mouse/)) {
+      ({layerX: x, layerY: y} = event);
+      console.log(event);
     }
-    this.log({type, touches, pressure});
+    this.log({type, touches, force, position: {x, y}});
   }
 
   @autobind
@@ -35,6 +40,8 @@ export default class HappySandwichMaker extends Component {
 
   @autobind
   log(data) {
+    const {pageX, pageY} = (data.touch || {});
+    console.log({pageX, pageY});
     this._logs.push(data);
     this.setState({logs: this._logs});
   }
@@ -45,8 +52,9 @@ export default class HappySandwichMaker extends Component {
     return (
       <Flex row
             style={{width, height}}>
-        <FlexItem fluid component={'canvas'} style={{border: '2px solid pink'}}
+        <FlexItem fluid component={Canvas} style={{border: '2px solid pink'}}
                   onMouseDown={this.genericHandler}
+                  onMouseMove={this.genericHandler}
                   onMouseUp={this.genericHandler}
                   onTouchStart={this.genericHandler}
                   onTouchMove={this.genericHandler}
@@ -59,8 +67,9 @@ export default class HappySandwichMaker extends Component {
             <thead>
             <tr>
               <th>Event Type</th>
-              <th>First finger</th>
-              <th>pressure</th>
+              <th>X</th>
+              <th>Y</th>
+              <th>force</th>
             </tr>
             </thead>
             <tbody style={{}}>
@@ -68,8 +77,9 @@ export default class HappySandwichMaker extends Component {
               (log, $ind) =>
                 <tr key={$ind}>
                   <td>{log.type}</td>
-                  <td>{log.touches}</td>
-                  <td>{log.touches ? log.pressure : 'x'}</td>
+                  <td>{log.position ? log.position.x : ''}</td>
+                  <td>{log.position ? log.position.y : ''}</td>
+                  <td>{log.touches ? log.force : 'x'}</td>
                 </tr>
             )}
             </tbody>
