@@ -21,7 +21,9 @@ export default class HappySandwichMaker extends Component {
   genericHandler(e) {
     const {type, touches} = e;
     let pressure;
-    if (touches && touches.length >= 1 && typeof touches[0].pressure)
+    if (touches && touches.length >= 1 && typeof touches[0].pressure !== 'undefined') {
+      pressure = touches[0].pressure;
+    }
     this.log({type, touches, pressure});
   }
 
@@ -41,10 +43,9 @@ export default class HappySandwichMaker extends Component {
     const {width, height, scale, offset, ..._props} = this.props;
     const {logs} = this.state;
     return (
-      <Flex row>
-        <FlexItem fluid comp='canvas'
-                  width={width}
-                  height={height}
+      <Flex row
+            style={{width, height}}>
+        <FlexItem fluid component={'canvas'} style={{border: '2px solid pink'}}
                   onMouseDown={this.genericHandler}
                   onMouseUp={this.genericHandler}
                   onTouchStart={this.genericHandler}
