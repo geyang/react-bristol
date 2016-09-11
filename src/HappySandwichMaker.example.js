@@ -1,6 +1,4 @@
-/**
- * Created by ge on 6/23/16.
- */
+/** Created by ge on 6/23/16. */
 import React, {Component, PropTypes} from "react";
 import HappySandwichMaker from "./HappySandwichMaker";
 
