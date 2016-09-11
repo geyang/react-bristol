@@ -1,9 +1,13 @@
+dist
+
 # webStorm files
 .idea
 
 # log files
 *.log
+*.log*
 *.logs
+*.logs*
 
 # node files
 *~

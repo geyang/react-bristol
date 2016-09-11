@@ -4,14 +4,16 @@
 import React, {Component, PropTypes} from "react";
 import HappySandwichMaker from "./HappySandwichMaker";
 
+const style = {
+  border: ' 1px solid pink'
+};
 var {number, string} = PropTypes;
 export default class HappySandwichMakerExample extends Component {
   render() {
     return (
-      <HappySandwichMaker lattice={true}
-                          protein="turkey"
-                          cheese="PepperJack"
-                          onBite={()=>alert("This is delicious!!")}
+      <HappySandwichMaker width={1000}
+                          height={800}
+                          style={style}
       />
     );
   }

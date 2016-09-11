@@ -1,92 +1,78 @@
-/*
- * Created by ge on 6/23/16.
- */
-import React, {Component, PropTypes} from "react";
+import React, {Component, PropTypes} from 'react';
+import autobind from 'autobind-decorator';
+import {Flex, FlexItem} from 'layout-components';
 
 var {func, bool, string, oneOf} = PropTypes;
-
-const style = {
-  backgroundColor: "red",
-  margin: 0,
-  color: "white",
-  fontSize: "23px",
-  fontWeight: 600,
-  lineHeight: "23px",
-  padding: "12px",
-  border: "none",
-  borderRight: "solid 2px #444",
-  borderBottom: "solid 2px #444",
-  borderRadius: "4px"
-};
 /**
  * description of the component
  */
 export default class HappySandwichMaker extends Component {
 
-  static propTypes = {
-    /** Whether we add lattice */
-    lattice: bool,
-    /** Which kind of cheese? */
-    cheese: oneOf(["PepperJack", "Swiss", "American"]).isRequired,
-    /**
-     * The protein we add into the sandwich.
-     * For example:
-     * - Teriyaki Chicken
-     * - Phily-cheese Steak
-     * - Tuna Salad
-     * - Seafood Salad
-     * - fake chicken patty (veg)
-     * */
-    protein: string.isRequired,
-    /**
-     * the bite event handler. Called when you bite into the sandwich
-     */
-    onBite: func
-  };
+  static propTypes = {};
 
-  static defaultProps = {
-    lattice: true
-  };
-
-  wisdoms = {
-    0: {text: "Click Me!", action: "next", color: "#49CAF5"},
-    1: {text: "I can make you sandwiches!", action: "next", color: "rgb(251, 155, 165)"},
-    2: {
-      text: "Here are the places to pick it up!",
-      action: "link",
-      href: "http://www.yelp.com/c/sf/sandwiches",
-      color: "#A1D490"
-    }
-  };
+  static defaultProps = {};
 
   componentWillMount() {
-    this.setState({currentIndex: 0});
+    this._logs = [];
+    this.setState({logs: this._logs});
   }
 
-  getCurrentState() {
-    return this.wisdoms[this.state.currentIndex];
+  @autobind
+  genericHandler(e) {
+    const {type} = e;
+    this.log({type});
   }
 
-  next() {
-    console.log(this);
-    this.setState({currentIndex: (this.state.currentIndex || 0) + 1})
+  @autobind
+  clearLogs() {
+    this._logs = [];
+    this.setState({logs: this._logs});
+  }
+
+  @autobind
+  log(data) {
+    this._logs.push(data);
+    this.setState({logs: this._logs});
   }
 
   render() {
-    var {children} = this.props;
-    var {color, text, action, href} = this.getCurrentState();
+    const {width, height, scale, offset, ..._props} = this.props;
+    const {logs} = this.state;
     return (
-      <div style={{"display": "flex", flexDirection: "row", justifyContent: "center", width: "100%"}}>
-        {(action == "next") ?
-          <button style={{...style, flex: "0 0 auto", backgroundColor: color}} onClick={this.next.bind(this)}>
-            {text}
-          </button> :
-          <a style={{...style, flex: "0 0 auto", backgroundColor: color}} href={href}>
-            {text}
-          </a>
-        }
-
-      </div>
+      <Flex row>
+        <FlexItem fluid component='canvas'
+                  width={width}
+                  height={height}
+                  onMouseDown={this.genericHandler}
+                  onMouseUp={this.genericHandler}
+                  onTouchStart={this.genericHandler}
+                  onTouchMove={this.genericHandler}
+                  onTouchEnd={this.genericHandler}
+                  onTouchCancel={this.genericHandler} {..._props}
+        />
+        <FlexItem fixed width="200px">
+          <button onClick={this.clearLogs}>clear logs</button>
+          <table>
+            <thead>
+            <tr>
+              <td>Event Type</td>
+            </tr>
+            </thead>
+            <tbody style={{
+              display: 'block',
+              height: "400px",
+              overflowY: 'auto'
+            }}>
+            {logs.map(
+              (log, $ind) =>
+                <tr key={$ind}>
+                  <td>{log.type}</td>
+                </tr>
+            )}
+            </tbody>
+          </table>
+        </FlexItem>
+      </Flex>
     );
   }
 }
