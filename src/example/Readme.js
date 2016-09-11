@@ -14,25 +14,17 @@ import HappySandwichMakerAST from "!!react-docgen!../HappySandwichMaker";
 export default function Readme({}) {
   return (
     <Markdown stripIndent={true}>{`
-      # React ES6 Component Template
+      # React Canvas Paint Demo
 
-      [![github](https://img.shields.io/github/downloads/episodeyang/react-canvas-paint/total.svg?style=flat-square&maxAge=2592000)]()
+      [![github](https://img.shields.io/github/downloads/episodeyang/react-bristol/total.svg?style=flat-square&maxAge=2592000)]()
 
-      A template repo for react components written with es6 syntax.
+      A HTML5 canvas component that allows you to draw inside the browser.
 
-      ## Usage (as a template)
+      ## Usage
 
-      ~~~shell
-      git clone https://github.com/episodeyang/react-canvas-paint \<name of your new component\>
-      cd \<name of your new component\>
-      rm -rf .git
-      rm -rf dist
+      [ ] todo: need to publish as npm module.
 
-      # now do your git init, git add/coommit/push
-      # replace "react-canvas-paint" with your own
-      # replace "react es6 template" with your own
-      # replace "react es6 component" with you own etc.
-      ~~~
+      ## Develop
 
       After cloning from gitHub, you can run the example by doing
       ~~~shell
@@ -41,17 +33,8 @@ export default function Readme({}) {
 
       And then open your browser at [http://localhost:5000](http://localhost:5000).
 
-      This one calls webpack (you should look at the \`package.json\` source) and uses the
-      webpack-dev-server to serve from \`./src/example/\` with hot module reloading.
-
-      ### How is this README written:
-      This readme is written with react and markdown. It includes:
-      1. a **live react component demo**
-      2. a table of the component's props that is generated automatically
-      3. **source** of the example component
-
-      ## Example Component: \`HappySandwichMaker\`
-      This component makes you a delicious Subway sandwich.
+      ## Live Demo: \`Bristol\`
+      showing basic pointer events and force detection (with force touch and apple pencil)
       `}
       <HappySandwichMakerExample/>
       ### Props
