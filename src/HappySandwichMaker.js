@@ -26,7 +26,7 @@ export default class HappySandwichMaker extends Component {
       force = touches[0].force;
       ({clientX: x, clientY: y} = touches[0]);
     } else if (type.match(/^mouse/)) {
-      ({layerX: x, layerY: y} = event);
+      ({clientX: x, clientY: y} = event);
       console.log(event);
     }
     this.log({type, touches, force, position: {x, y}});
