@@ -19,8 +19,10 @@ export default class HappySandwichMaker extends Component {
 
   @autobind
   genericHandler(e) {
-    const {type} = e;
-    this.log({type});
+    const {type, touches} = e;
+    let pressure;
+    if (touches && touches.length >= 1 && typeof touches[0].pressure)
+    this.log({type, touches, pressure});
   }
 
   @autobind
@@ -40,7 +42,7 @@ export default class HappySandwichMaker extends Component {
     const {logs} = this.state;
     return (
       <Flex row>
-        <FlexItem fluid component='canvas'
+        <FlexItem fluid comp='canvas'
                   width={width}
                   height={height}
                   onMouseDown={this.genericHandler}
@@ -48,25 +50,25 @@ export default class HappySandwichMaker extends Component {
                   onTouchStart={this.genericHandler}
                   onTouchMove={this.genericHandler}
                   onTouchEnd={this.genericHandler}
-                  onTouchCancel={this.genericHandler} {..._props}
-        />
-        <FlexItem fixed width="200px">
+                  onTouchCancel={this.genericHandler}
+                  {..._props}/>
+        <FlexItem fixed width="400px">
           <button onClick={this.clearLogs}>clear logs</button>
           <table>
             <thead>
             <tr>
-              <td>Event Type</td>
+              <th>Event Type</th>
+              <th>First finger</th>
+              <th>pressure</th>
             </tr>
             </thead>
-            <tbody style={{
-              display: 'block',
-              height: "400px",
-              overflowY: 'auto'
-            }}>
+            <tbody style={{}}>
             {logs.map(
               (log, $ind) =>
                 <tr key={$ind}>
                   <td>{log.type}</td>
+                  <td>{log.touches}</td>
+                  <td>{log.touches ? log.pressure : 'x'}</td>
                 </tr>
             )}
             </tbody>
@@ -76,3 +78,7 @@ export default class HappySandwichMaker extends Component {
     );
   }
 }
+
+// onGuestureStart={this.genericHandler}
+// onGuestureChange={this.genericHandler}
+// onGuestureEnd={this.genericHandler}
