@@ -15,21 +15,63 @@ export default class HappySandwichMaker extends Component {
 
   componentWillMount() {
     this._logs = [];
+    this._paths = {};
     this.setState({logs: this._logs});
+  }
+
+  componentDidMount() {
+    this.canvas = this.refs['active'];
+    this.activeContext = this.canvas.context;
   }
 
   @autobind
   genericHandler(event) {
     const {type, touches} = event;
-    let force, x, y;
+    let pageX, pageY, force, tilt;
     if (touches && touches.length >= 1 && typeof touches[0].force !== 'undefined') {
-      force = touches[0].force;
-      ({clientX: x, clientY: y} = touches[0]);
+      ({pageX, pageY, force, tilt} = touches[0]);
     } else if (type.match(/^mouse/)) {
-      ({clientX: x, clientY: y} = event);
-      console.log(event);
+      ({pageX, pageY} = event);
     }
-    this.log({type, touches, force, position: {x, y}});
+    const x = pageX - this.canvas.pageOffset.left;
+    const y = pageY - this.canvas.pageOffset.top;
+
+    switch (type) {
+      case 'mousedown':
+        this.startDrawing({id: 'mouse', x, y});
+        break;
+      case 'touchstart':
+        this.startDrawing({id: touch.identifier, x, y, force, tilt});
+        break;
+      case 'mousemove':
+        this.appendDrawing({id: 'mouse', x, y});
+        break;
+      case 'touchmove':
+        this.appendDrawing({id: touch.identifier, x, y, force, tilt});
+        break;
+      case 'mouseup':
+        this.endDrawing({id: 'mouse', x, y});
+        break;
+      case 'touchend':
+        this.endDrawing({id: touch.identifier, x, y, force, tilt});
+        console.log('touchend', x, y);
+        break;
+    }
+    this._throttledDraw();
+  }
+
+  startDrawing({id, x, y, force, tilt}) {
+    this._paths[id] = [{x, y, force, tilt}];
+  }
+
+  appendDrawing({id, x, y, force, tilt}) {
+    if (!this._paths[id]) return;
+    this._paths[id].push({x, y, force, tilt});
+  }
+
+  endDrawing({id, x, y, force, tilt}) {
+    this.appendDrawing({id, x, y, force, tilt});
+    setTimeout(() => delete this._paths[id], 16);
   }
 
   @autobind
@@ -40,56 +82,47 @@ export default class HappySandwichMaker extends Component {
 
   @autobind
   log(data) {
-    const {pageX, pageY} = (data.touch || {});
-    console.log({pageX, pageY});
+    const {x, y} = (data.position || {});
     this._logs.push(data);
     this.setState({logs: this._logs});
   }
 
+  draw(path, stylus) {
+    if (!path) return;
+    let context = this.activeContext;
+    context.beginPath();
+    context.lineWidth = 1;
+    context.strokeStyle = "red";
+    context.moveTo(path[0].x, path[0].y);
+    for (var i = 1; i < path.length; i++) {
+      context.lineTo(path[i].x, path[i].y);
+      // context.quadraticCurveTo(20,100,10,20);
+    }
+    context.stroke();
+  }
+
+  _throttledDraw() {
+    for (let key in this._paths) {
+      const path = this._paths[key];
+      this.draw(path)
+    }
+  }
+
   render() {
     const {width, height, scale, offset, ..._props} = this.props;
-    const {logs} = this.state;
     return (
-      <Flex row
-            style={{width, height}}>
-        <FlexItem fluid component={Canvas} style={{border: '2px solid pink'}}
-                  onMouseDown={this.genericHandler}
-                  onMouseMove={this.genericHandler}
-                  onMouseUp={this.genericHandler}
-                  onTouchStart={this.genericHandler}
-                  onTouchMove={this.genericHandler}
-                  onTouchEnd={this.genericHandler}
-                  onTouchCancel={this.genericHandler}
-                  {..._props}/>
-        <FlexItem fixed width="400px">
-          <button onClick={this.clearLogs}>clear logs</button>
-          <table>
-            <thead>
-            <tr>
-              <th>Event Type</th>
-              <th>X</th>
-              <th>Y</th>
-              <th>force</th>
-            </tr>
-            </thead>
-            <tbody style={{}}>
-            {logs.map(
-              (log, $ind) =>
-                <tr key={$ind}>
-                  <td>{log.type}</td>
-                  <td>{log.position ? log.position.x : ''}</td>
-                  <td>{log.position ? log.position.y : ''}</td>
-                  <td>{log.touches ? log.force : 'x'}</td>
-                </tr>
-            )}
-            </tbody>
-          </table>
-        </FlexItem>
-      </Flex>
+      <Canvas ref="active"
+              style={{border: '2px solid pink'}}
+              width={width}
+              height={height}
+              onMouseDown={this.genericHandler}
+              onMouseMove={this.genericHandler}
+              onMouseUp={this.genericHandler}
+              onTouchStart={this.genericHandler}
+              onTouchMove={this.genericHandler}
+              onTouchEnd={this.genericHandler}
+              onTouchCancel={this.genericHandler}
+              {..._props}/>
     );
   }
 }
-
-// onGuestureStart={this.genericHandler}
-// onGuestureChange={this.genericHandler}
-// onGuestureEnd={this.genericHandler}
