@@ -18,9 +18,9 @@ var _autobindDecorator = require("autobind-decorator");
 
 var _autobindDecorator2 = _interopRequireDefault(_autobindDecorator);
 
-var _CanvasDrawable = require("./CanvasDrawable");
+var _Bristol = require("./Bristol");
 
-var _CanvasDrawable2 = _interopRequireDefault(_CanvasDrawable);
+var _Bristol2 = _interopRequireDefault(_Bristol);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -79,7 +79,7 @@ var HappySandwichMakerExample = (_class = function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      return _react2.default.createElement(_CanvasDrawable2.default, { width: 1000,
+      return _react2.default.createElement(_Bristol2.default, { width: 1000,
         height: 400,
         style: style,
         onImageUpdate: this.saveImage

@@ -25,7 +25,7 @@ export default function Readme({}) {
       At the moment, the touch events mobile safari emits have integer coordinates, making the inputs
       a bit jagged The input event frequency is also on the lower side.
 
-      There is currently a ticket in webkit that changes the input coordinates to `double`. Not sure
+      There is currently a ticket in webkit that changes the input coordinates to \`double\`. Not sure
       when it will land though.
 
       We might be able to use a simple neural net to de-jag the hand writing.
