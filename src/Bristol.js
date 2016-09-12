@@ -17,7 +17,7 @@ export default class HappySandwichMaker extends Component {
     width: number,
     height: number,
     renderRatio: number,
-    onPaintCommit: func
+    onImageUpdate: func
   };
 
   static defaultProps = {
@@ -129,8 +129,8 @@ export default class HappySandwichMaker extends Component {
   patchPaintStack(newPath, save = true) {
     pen(this.inactive.context, newPath.data);
     if (save) this.inactive.saveImage();
-    const {onPaintCommit} = this.props;
-    if (onPaintCommit) onPaintCommit(this.inactive.image);
+    const {onImageUpdate} = this.props;
+    if (onImageUpdate) onImageUpdate(this.inactive.image);
   }
 
   updatePaintStack() {

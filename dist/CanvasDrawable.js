@@ -339,19 +339,19 @@ exports.default = HappySandwichMaker;
     return;
   }
 
-  __REACT_HOT_LOADER__.register(pen, 'pen', 'src/CanvasDrawable.js');
+  __REACT_HOT_LOADER__.register(pen, 'pen', 'src/Bristol.js');
 
-  __REACT_HOT_LOADER__.register(number, 'number', 'src/CanvasDrawable.js');
+  __REACT_HOT_LOADER__.register(number, 'number', 'src/Bristol.js');
 
-  __REACT_HOT_LOADER__.register(func, 'func', 'src/CanvasDrawable.js');
+  __REACT_HOT_LOADER__.register(func, 'func', 'src/Bristol.js');
 
-  __REACT_HOT_LOADER__.register(bool, 'bool', 'src/CanvasDrawable.js');
+  __REACT_HOT_LOADER__.register(bool, 'bool', 'src/Bristol.js');
 
-  __REACT_HOT_LOADER__.register(string, 'string', 'src/CanvasDrawable.js');
+  __REACT_HOT_LOADER__.register(string, 'string', 'src/Bristol.js');
 
-  __REACT_HOT_LOADER__.register(oneOf, 'oneOf', 'src/CanvasDrawable.js');
+  __REACT_HOT_LOADER__.register(oneOf, 'oneOf', 'src/Bristol.js');
 
-  __REACT_HOT_LOADER__.register(HappySandwichMaker, 'HappySandwichMaker', 'src/CanvasDrawable.js');
+  __REACT_HOT_LOADER__.register(HappySandwichMaker, 'HappySandwichMaker', 'src/Bristol.js');
 })();
 
 ;

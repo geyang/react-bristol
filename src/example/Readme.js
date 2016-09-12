@@ -9,31 +9,30 @@ import PropsTable from "react-component-props-table";
 
 import HappySandwichMakerExample from "../HappySandwichMaker.example";
 import HappySandwichMakerSource from "!!raw!../HappySandwichMaker.example";
-import HappySandwichMakerAST from "!!react-docgen!../CanvasDrawable";
+import HappySandwichMakerAST from "!!react-docgen!../Bristol";
 
 export default function Readme({}) {
   return (
     <Markdown stripIndent={true}>{`
-      # React Canvas Paint Demo
+      # React Bristol (Board)
 
       [![github](https://img.shields.io/github/downloads/episodeyang/react-bristol/total.svg?style=flat-square&maxAge=2592000)]()
 
-      A HTML5 canvas component that allows you to draw inside the browser.
+      A HTML5 canvas component supporting Apple Pencil and force touch.
 
-      ## Usage
+      This is a quick proof-of-concept component I built to test out the performance of mobile safari's
+      input events, to see if I can build a Apple Pencil note taking app that lives inside the browser.
+      At the moment, the touch events mobile safari emits have integer coordinates, making the inputs
+      a bit jagged The input event frequency is also on the lower side.
 
-      [ ] todo: need to publish as npm module.
+      There is currently a ticket in webkit that changes the input coordinates to `double`. Not sure
+      when it will land though.
 
-      ## Develop
+      We might be able to use a simple neural net to de-jag the hand writing.
 
-      After cloning from gitHub, you can run the example by doing
-      ~~~shell
-      npm run serve-docs
-      ~~~
+      - [ ] todo: need to publish as npm module.
 
-      And then open your browser at [http://localhost:5000](http://localhost:5000).
-
-      ## Live Demo: \`Bristol\`
+      ## Usage and Live Demo: \`Bristol\`
       showing basic pointer events and force detection (with force touch and apple pencil)
       `}
       <HappySandwichMakerExample/>
@@ -50,10 +49,12 @@ export default function Readme({}) {
       {`
       ## Develop
 
-      1. First make your changes, then git commit. Use \`serve-docs\` to view live update at [http://localhost:5000](http://localhost:5000).
-      2. run \`build-docs\`, \`build-static-docs\`, \`gh-pages\`
-      3. Then remember to push to master.
+      After cloning from gitHub, you can run the example by doing
+      ~~~shell
+      npm run serve-docs
+      ~~~
 
+      And then open your browser at [http://localhost:5000](http://localhost:5000).
       `}
     </Markdown>
   )
