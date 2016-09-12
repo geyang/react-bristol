@@ -1,10 +1,10 @@
 import React, {Component, PropTypes} from 'react';
 import autobind from 'autobind-decorator';
 import Canvas from './Canvas';
-// import SimplePen from './extensions/simplePen';
-// const simplePen = SimplePen({color: 'blue', strokeWidth: 1});
-import CalligraphyPen from './extensions/calligraphyPen';
-const pen = CalligraphyPen({color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 0});
+import SimplePen from './extensions/simplePen';
+const pen = SimplePen({color: 'blue', strokeWidth: 1});
+// import CalligraphyPen from './extensions/calligraphyPen';
+// const pen = CalligraphyPen({color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 1});
 
 
 var {number, func, bool, string, oneOf} = PropTypes;
@@ -16,7 +16,8 @@ export default class HappySandwichMaker extends Component {
   static propTypes = {
     width: number,
     height: number,
-    renderRatio: number
+    renderRatio: number,
+    onPaintCommit: func
   };
 
   static defaultProps = {
@@ -29,8 +30,8 @@ export default class HappySandwichMaker extends Component {
   }
 
   componentDidMount() {
-    this.canvas = this.refs['active'];
-    this.activeContext = this.canvas.context;
+    this.active = this.refs['active'];
+    this.inactive = this.refs['inactive'];
     this.updatePaintStack()
   }
 
@@ -77,14 +78,14 @@ export default class HappySandwichMaker extends Component {
   }
 
   getDressedCursorPosition(pageX, pageY, refreshOffset = false) {
-    if (refreshOffset) this.canvas.clearPageOffset();
+    if (refreshOffset) this.active.clearPageOffset();
     const {renderRatio} =  this.props;
     const pos = {
-      x: (pageX - this.canvas.pageOffset.left
-        - (this.canvas.pageOffset.width - this.props.width) / 2
+      x: (pageX - this.active.pageOffset.left
+        - (this.active.pageOffset.width - this.props.width) / 2
       ) * renderRatio,
-      y: (pageY - this.canvas.pageOffset.top
-        - (this.canvas.pageOffset.height - this.props.height) / 2
+      y: (pageY - this.active.pageOffset.top
+        - (this.active.pageOffset.height - this.props.height) / 2
       ) * renderRatio
     };
     return pos;
@@ -111,65 +112,57 @@ export default class HappySandwichMaker extends Component {
 
   completePath({id}) {
     // this need to go into a function
-    this._paintStack.push(this._activePaths[id]);
+    let path = this._activePaths[id];
+    this._paintStack.push(path);
     delete this._activePaths[id];
-    this.updatePaintStack()
+    this.patchPaintStack(path);
+    // this.updatePaintStack()
   }
 
   draw() {
     // 0. clear
-    this.putImage();
+    this.active.clear();
     //2. draw active
     this.drawActivePaths();
   }
 
-  clear() {
-    const {width, height, renderRatio} = this.props;
-    this.activeContext.clearRect(0, 0, width * renderRatio, height * renderRatio);
-  }
-
-  getImageData() {
-    const {width, height, renderRatio} = this.props;
-    return this.activeContext.getImageData(0, 0, width * renderRatio, height * renderRatio);
-  }
-
-  saveImage() {
-    this.paintStackImage = this.getImageData();
-  }
-
-  putImage() {
-    return this.activeContext.putImageData(this.paintStackImage, 0, 0);
+  patchPaintStack(newPath, save = true) {
+    pen(this.inactive.context, newPath.data);
+    if (save) this.inactive.saveImage();
+    const {onPaintCommit} = this.props;
+    if (onPaintCommit) onPaintCommit(this.inactive.image);
   }
 
   updatePaintStack() {
     // this.putImage();
-    this.clear();
+    this.inactive.clear();
     this._paintStack.forEach(
       ({data}) => {
         // todo: get pen info from path meta data next time.
-        pen(this.activeContext, data);
+        pen(this.inactive.context, data);
       });
-    this.saveImage();
+    this.inactive.saveImage();
   }
 
   drawActivePaths() {
     for (let key in this._activePaths) {
       const pathData = this._activePaths[key].data;
-      pen(this.activeContext, pathData)
+      pen(this.active.context, pathData)
     }
   }
 
   render() {
     const {width, height, renderRatio, scale, offset, style, ..._props} = this.props;
+    const canvasStyle = {
+      position: 'absolute',
+      top: 0, left: 0,
+      transform: `scale(${1 / renderRatio}, ${1 / renderRatio})` +
+      `translate(${-width * renderRatio}px, ${-height * renderRatio}px)`
+    };
     return (
       <div style={{width, height, position: 'relative', ...style}}>
         <Canvas ref="active"
-                style={{
-                  position: 'absolute',
-                  top: 0, left: 0,
-                  transform: `scale(${1 / renderRatio}, ${1 / renderRatio})` +
-                  `translate(${-width * renderRatio}px, ${-height * renderRatio}px)`
-                }}
+                style={canvasStyle}
                 width={width * renderRatio}
                 height={height * renderRatio}
                 onMouseDown={this.genericHandler}
@@ -180,7 +173,11 @@ export default class HappySandwichMaker extends Component {
                 onTouchEnd={this.genericHandler}
                 onTouchCancel={this.genericHandler}
                 {..._props}/>
-
+        <Canvas ref="inactive"
+                style={{...canvasStyle, zIndex: -1}}
+                width={width * renderRatio}
+                height={height * renderRatio}
+        />
       </div>
     );
   }

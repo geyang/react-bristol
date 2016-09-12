@@ -31,6 +31,24 @@ export default class Canvas extends Component {
     return this.pageOffset
   }
 
+  clear() {
+    const {width, height} = this.props;
+    this.context.clearRect(0, 0, width, height);
+  }
+
+  getImageData() {
+    const {width, height} = this.props;
+    return this.context.getImageData(0, 0, width, height);
+  }
+
+  saveImage() {
+    this.image = this.getImageData();
+  }
+
+  putImage() {
+    return this.context.putImageData(this.image, 0, 0);
+  }
+
   render() {
     const {..._props} = this.props;
     return <canvas {..._props}/>

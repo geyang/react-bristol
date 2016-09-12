@@ -1,5 +1,5 @@
 /** Created by ge on 9/10/16. */
-var canvas = document.getElementsByTagName('canvas')[0];
+var canvas = document.getElementsByTagName('active')[0];
 canvas.width = 800;
 canvas.height = 600;
 
@@ -12,7 +12,7 @@ window.onload = function () {
 
   function redraw() {
 
-    // Clear the entire canvas
+    // Clear the entire active
     var p1 = ctx.transformedPoint(0, 0);
     var p2 = ctx.transformedPoint(canvas.width, canvas.height);
     ctx.clearRect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
