@@ -85,7 +85,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
     key: 'componentWillMount',
     value: function componentWillMount() {
       this._logs = [];
-      this._paths = {};
+      this._activePaths = {};
       this.setState({ logs: this._logs });
     }
   }, {
@@ -158,7 +158,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var force = _ref3.force;
       var tilt = _ref3.tilt;
 
-      this._paths[id] = [{ x: x, y: y, force: force, tilt: tilt }];
+      this._activePaths[id] = [{ x: x, y: y, force: force, tilt: tilt }];
     }
   }, {
     key: 'appendPathPoint',
@@ -169,8 +169,8 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var force = _ref4.force;
       var tilt = _ref4.tilt;
 
-      if (!this._paths[id]) return;
-      this._paths[id].push({ x: x, y: y, force: force, tilt: tilt });
+      if (!this._activePaths[id]) return;
+      this._activePaths[id].push({ x: x, y: y, force: force, tilt: tilt });
     }
   }, {
     key: 'completePath',
@@ -185,7 +185,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
 
       this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
       setTimeout(function () {
-        return delete _this3._paths[id];
+        return delete _this3._activePaths[id];
       }, 16);
     }
   }, {
@@ -206,7 +206,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       this.setState({ logs: this._logs });
     }
   }, {
-    key: 'draw',
+    key: 'simplePen',
     value: function draw(context, path, stylus) {
       if (!path) return;
       context.beginPath();
@@ -222,10 +222,10 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       context.stroke();
     }
   }, {
-    key: '_throttledDraw',
+    key: 'drawActivePaths',
     value: function _throttledDraw() {
-      for (var key in this._paths) {
-        var path = this._paths[key];
+      for (var key in this._activePaths) {
+        var path = this._activePaths[key];
         var context = this.activeContext;
         var _props2 = this.props;
         var width = _props2.width;

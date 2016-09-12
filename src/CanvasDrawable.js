@@ -10,16 +10,18 @@ var {number, func, bool, string, oneOf} = PropTypes;
 export default class HappySandwichMaker extends Component {
 
   static propTypes = {
-    scaleRatio: number
+    width: number,
+    height: number,
+    renderRatio: number
   };
 
   static defaultProps = {
-    scaleRatio: 3
+    renderRatio: 3
   };
 
   componentWillMount() {
     this._activePaths = {};
-    this._allPaths = [];
+    this._paintStack = [];
   }
 
   componentDidMount() {
@@ -46,9 +48,10 @@ export default class HappySandwichMaker extends Component {
 
   getDressedCursorPosition(pageX, pageY, refreshOffset = false) {
     if (refreshOffset) this.canvas.clearPageOffset();
+    const {renderRatio} =  this.props;
     return {
-      x: pageX - this.canvas.pageOffset.left - (this.canvas.pageOffset.width - this.props.width) / 2,
-      y: pageY - this.canvas.pageOffset.top - (this.canvas.pageOffset.height - this.props.height) / 2
+      x: (pageX - this.canvas.pageOffset.left - (this.canvas.pageOffset.width - this.props.width) / 2) * renderRatio,
+      y: (pageY - this.canvas.pageOffset.top - (this.canvas.pageOffset.height - this.props.height) / 2) * renderRatio
     };
   }
 
@@ -72,7 +75,7 @@ export default class HappySandwichMaker extends Component {
         setTimeout(() => this.completePath({id}), 16);
         break;
     }
-    this.drawActivePaths();
+    this.draw();
   }
 
   startPath({id, x, y, force, tilt}) {
@@ -85,34 +88,51 @@ export default class HappySandwichMaker extends Component {
   }
 
   completePath({id}) {
-    this._allPaths.push(this._activePaths[id]);
+    // this need to go into a function
+    this._paintStack.push(this._activePaths[id]);
     delete this._activePaths[id];
+  }
+
+  draw() {
+    //1. draw existing
+    //2. draw active
+    this.drawActivePaths();
+    //3. rescale
+    // todo: use inactiveContext
+    const {renderRatio} = this.props;
+    // console.log(renderRatio);
+    this.activeContext.scale(1, 1);
   }
 
   drawActivePaths() {
     for (let key in this._activePaths) {
       const path = this._activePaths[key];
       const context = this.activeContext;
-      const {width, height} = this.props;
       simplePen(context, path)
     }
   }
 
   render() {
-    const {width, height, scaleRatio, scale, offset, ..._props} = this.props;
+    const {width, height, renderRatio, scale, offset, style, ..._props} = this.props;
     return (
-      <Canvas ref="active"
-              style={{border: '2px solid pink'}}
-              width={width}
-              height={height}
-              onMouseDown={this.genericHandler}
-              onMouseMove={this.genericHandler}
-              onMouseUp={this.genericHandler}
-              onTouchStart={this.genericHandler}
-              onTouchMove={this.genericHandler}
-              onTouchEnd={this.genericHandler}
-              onTouchCancel={this.genericHandler}
-              {..._props}/>
+      <div style={{width, height, ...style}}>
+        <Canvas ref="active"
+                style={{
+                  transform: `scale(${1 / renderRatio}, ${1 / renderRatio})` +
+                  `translate(${-width * renderRatio}px, ${-height * renderRatio}px)`
+                }}
+                width={width * renderRatio}
+                height={height * renderRatio}
+                onMouseDown={this.genericHandler}
+                onMouseMove={this.genericHandler}
+                onMouseUp={this.genericHandler}
+                onTouchStart={this.genericHandler}
+                onTouchMove={this.genericHandler}
+                onTouchEnd={this.genericHandler}
+                onTouchCancel={this.genericHandler}
+                {..._props}/>
+
+      </div>
     );
   }
 }
