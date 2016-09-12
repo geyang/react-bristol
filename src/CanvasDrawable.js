@@ -4,7 +4,7 @@ import Canvas from './Canvas';
 // import SimplePen from './extensions/simplePen';
 // const simplePen = SimplePen({color: 'blue', strokeWidth: 1});
 import CalligraphyPen from './extensions/calligraphyPen';
-const pen = CalligraphyPen({color: 'blue', strokeWidth: 10,  angle: -45, epsilon: 0.1, blur: 0});
+const pen = CalligraphyPen({color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 0});
 
 
 var {number, func, bool, string, oneOf} = PropTypes;
@@ -50,14 +50,6 @@ export default class HappySandwichMaker extends Component {
     }
   }
 
-  getDressedCursorPosition(pageX, pageY, refreshOffset = false) {
-    if (refreshOffset) this.canvas.clearPageOffset();
-    const {renderRatio} =  this.props;
-    return {
-      x: (pageX - this.canvas.pageOffset.left - (this.canvas.pageOffset.width - this.props.width) / 2) * renderRatio,
-      y: (pageY - this.canvas.pageOffset.top - (this.canvas.pageOffset.height - this.props.height) / 2) * renderRatio
-    };
-  }
 
   recordTouch({eventType, id, pageX, pageY, force, tilt}) {
     let x, y;
@@ -69,6 +61,7 @@ export default class HappySandwichMaker extends Component {
         break;
       case 'mousemove':
       case 'touchmove':
+        if (!this.getActivePath(id)) return;
         ({x, y} = this.getDressedCursorPosition(pageX, pageY));
         this.appendPathPoint({id, x, y, force, tilt});
         break;
@@ -82,6 +75,20 @@ export default class HappySandwichMaker extends Component {
     this.draw();
   }
 
+  getDressedCursorPosition(pageX, pageY, refreshOffset = false) {
+    if (refreshOffset) this.canvas.clearPageOffset();
+    const {renderRatio} =  this.props;
+    const pos = {
+      x: (pageX - this.canvas.pageOffset.left
+         - (this.canvas.pageOffset.width - this.props.width) / 2
+      ) * renderRatio,
+      y: (pageY - this.canvas.pageOffset.top
+        - (this.canvas.pageOffset.height - this.props.height) / 2
+      ) * renderRatio
+    };
+    return pos;
+  }
+
   startPath({id, x, y, force, tilt}) {
     this._activePaths[id] = {
       pressureSensitive: !!force, // 0 => false, undefined => false, 0.20 => true
@@ -90,10 +97,14 @@ export default class HappySandwichMaker extends Component {
     this.appendPathPoint({id, x, y, force, tilt});
   }
 
+  getActivePath(id) {
+    return this._activePaths[id];
+  }
+
   appendPathPoint({id, x, y, force, tilt}) {
-    const path = this._activePaths[id];
+    const path = this.getActivePath(id);
     if (!path) return;
-    else if (!path.pressureSensitive) force = 1;
+    if (!path.pressureSensitive) force = 1;
     path.data.push({x, y, force, tilt});
   }
 
@@ -120,9 +131,11 @@ export default class HappySandwichMaker extends Component {
   render() {
     const {width, height, renderRatio, scale, offset, style, ..._props} = this.props;
     return (
-      <div style={{width, height, ...style}}>
+      <div style={{width, height, position: 'relative', ...style}}>
         <Canvas ref="active"
                 style={{
+                  position: 'absolute',
+                  top: 0, left: 0,
                   transform: `scale(${1 / renderRatio}, ${1 / renderRatio})` +
                   `translate(${-width * renderRatio}px, ${-height * renderRatio}px)`
                 }}

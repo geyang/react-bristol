@@ -13,7 +13,16 @@ export default class Canvas extends Component {
 
   get pageOffset() {
     if (this._pageOffset) return this._pageOffset;
-    this._pageOffset = this.nativeElement.getBoundingClientRect();
+    const canvasRect = this.nativeElement.getBoundingClientRect();
+    const pageRect = window.document.body.getBoundingClientRect();
+    this._pageOffset = {
+      left: canvasRect.left - pageRect.left,
+      right: canvasRect.right - pageRect.right,
+      top: canvasRect.top - pageRect.top,
+      bottom: canvasRect.bottom - pageRect.bottom,
+      width: canvasRect.width,
+      height: canvasRect.height
+    };
     return this._pageOffset;
   }
 
