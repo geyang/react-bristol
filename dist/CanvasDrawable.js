@@ -98,8 +98,8 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
-      this.canvas = this.refs['active'];
-      this.activeContext = this.canvas.context;
+      this.active = this.refs['active'];
+      this.activeContext = this.active.context;
       this.updatePaintStack();
     }
   }, {
@@ -183,12 +183,12 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
     value: function getDressedCursorPosition(pageX, pageY) {
       var refreshOffset = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
-      if (refreshOffset) this.canvas.clearPageOffset();
+      if (refreshOffset) this.active.clearPageOffset();
       var renderRatio = this.props.renderRatio;
 
       var pos = {
-        x: (pageX - this.canvas.pageOffset.left - (this.canvas.pageOffset.width - this.props.width) / 2) * renderRatio,
-        y: (pageY - this.canvas.pageOffset.top - (this.canvas.pageOffset.height - this.props.height) / 2) * renderRatio
+        x: (pageX - this.active.pageOffset.left - (this.active.pageOffset.width - this.props.width) / 2) * renderRatio,
+        y: (pageY - this.active.pageOffset.top - (this.active.pageOffset.height - this.props.height) / 2) * renderRatio
       };
       return pos;
     }

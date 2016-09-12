@@ -52,7 +52,7 @@ var Canvas = (_temp = _class = function (_Component) {
     value: function render() {
       var _props = _objectWithoutProperties(this.props, []);
 
-      return _react2.default.createElement('canvas', _props);
+      return _react2.default.createElement('active', _props);
     }
   }, {
     key: 'pageOffset',

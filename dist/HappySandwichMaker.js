@@ -91,8 +91,8 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
-      this.canvas = this.refs['active'];
-      this.activeContext = this.canvas.context;
+      this.active = this.refs['active'];
+      this.activeContext = this.active.context;
     }
   }, {
     key: 'genericHandler',
@@ -114,8 +114,8 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
         pageX = event.pageX;
         pageY = event.pageY;
       }
-      var x = pageX - this.canvas.pageOffset.left;
-      var y = pageY - this.canvas.pageOffset.top;
+      var x = pageX - this.active.pageOffset.left;
+      var y = pageY - this.active.pageOffset.top;
 
       switch (type) {
         case 'mousedown':
