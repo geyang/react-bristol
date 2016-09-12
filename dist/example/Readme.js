@@ -29,9 +29,9 @@ var _HappySandwichMaker3 = require("!!raw!../HappySandwichMaker.example");
 
 var _HappySandwichMaker4 = _interopRequireDefault(_HappySandwichMaker3);
 
-var _CanvasDrawable = require("!!react-docgen!../CanvasDrawable");
+var _Bristol = require("!!react-docgen!../Bristol");
 
-var _CanvasDrawable2 = _interopRequireDefault(_CanvasDrawable);
+var _Bristol2 = _interopRequireDefault(_Bristol);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -46,14 +46,14 @@ function Readme(_ref) {
   return _react2.default.createElement(
     _reactMarkdownit2.default,
     { stripIndent: true },
-    "\n      # React Canvas Paint Demo\n\n      [![github](https://img.shields.io/github/downloads/episodeyang/react-bristol/total.svg?style=flat-square&maxAge=2592000)]()\n\n      A HTML5 canvas component that allows you to draw inside the browser.\n\n      ## Usage\n\n      [ ] todo: need to publish as npm module.\n\n      ## Develop\n\n      After cloning from gitHub, you can run the example by doing\n      ~~~shell\n      npm run serve-docs\n      ~~~\n\n      And then open your browser at [http://localhost:5000](http://localhost:5000).\n\n      ## Live Demo: `Bristol`\n      showing basic pointer events and force detection (with force touch and apple pencil)\n      ",
+    "\n      # React Bristol (Board)\n\n      [![github](https://img.shields.io/github/downloads/episodeyang/react-bristol/total.svg?style=flat-square&maxAge=2592000)]()\n\n      A HTML5 canvas component supporting Apple Pencil and force touch.\n\n      This is a quick proof-of-concept component I built to test out the performance of mobile safari's\n      input events, to see if I can build a Apple Pencil note taking app that lives inside the browser.\n      At the moment, the touch events mobile safari emits have integer coordinates, making the inputs\n      a bit jagged The input event frequency is also on the lower side.\n\n      There is currently a ticket in webkit that changes the input coordinates to `double`. Not sure\n      when it will land though.\n\n      We might be able to use a simple neural net to de-jag the hand writing.\n\n      - [ ] todo: need to publish as npm module.\n\n      ## Usage and Live Demo: `Bristol`\n      showing basic pointer events and force detection (with force touch and apple pencil)\n      ",
     _react2.default.createElement(_HappySandwichMaker2.default, null),
     "### Props",
     "This table below is generated automatically",
     _react2.default.createElement(
       "div",
       { className: "table-container horizontal-scroll flex-column center" },
-      _react2.default.createElement(_reactComponentPropsTable2.default, { propMetaData: _CanvasDrawable2.default.props })
+      _react2.default.createElement(_reactComponentPropsTable2.default, { propMetaData: _Bristol2.default.props })
     ),
     "\n      ### Usage Example\n\n      The source code below of the example above is loaded using the webpack raw loader.",
     _react2.default.createElement(
@@ -61,7 +61,7 @@ function Readme(_ref) {
       null,
       _HappySandwichMaker4.default
     ),
-    "\n      ## Develop\n\n      1. First make your changes, then git commit. Use `serve-docs` to view live update at [http://localhost:5000](http://localhost:5000).\n      2. run `build-docs`, `build-static-docs`, `gh-pages`\n      3. Then remember to push to master.\n\n      "
+    "\n      ## Develop\n\n      After cloning from gitHub, you can run the example by doing\n      ~~~shell\n      npm run serve-docs\n      ~~~\n\n      And then open your browser at [http://localhost:5000](http://localhost:5000).\n      "
   );
 }
 ;

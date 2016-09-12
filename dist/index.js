@@ -4,12 +4,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _CanvasDrawable = require("./CanvasDrawable");
+var _Bristol = require("./Bristol");
 
 Object.defineProperty(exports, "default", {
   enumerable: true,
   get: function get() {
-    return _interopRequireDefault(_CanvasDrawable).default;
+    return _interopRequireDefault(_Bristol).default;
   }
 });
 
