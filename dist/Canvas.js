@@ -53,15 +53,11 @@ var Canvas = (_temp = _class = function (_Component) {
     get: function get() {
       if (this._pageOffset) return this._pageOffset;
       this._pageOffset = this.nativeElement.getBoundingClientRect();
-      console.log(this._pageOffset);
       return this._pageOffset;
-    }
-
-    /** set pageOffset when block position has changed, to update the bounding box */
-    ,
+    },
     set: function set(value) {
-      this._pageOffset = {};
-      this.pageOffset();
+      this._pageOffset = undefined;
+      return this.pageOffset;
     }
   }]);
 

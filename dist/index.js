@@ -4,12 +4,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _HappySandwichMaker = require("./HappySandwichMaker");
+var _CanvasDrawable = require("./CanvasDrawable");
 
 Object.defineProperty(exports, "default", {
   enumerable: true,
   get: function get() {
-    return _interopRequireDefault(_HappySandwichMaker).default;
+    return _interopRequireDefault(_CanvasDrawable).default;
   }
 });
 

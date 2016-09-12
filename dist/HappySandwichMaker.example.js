@@ -11,9 +11,9 @@ var _react = require("react");
 
 var _react2 = _interopRequireDefault(_react);
 
-var _HappySandwichMaker = require("./HappySandwichMaker");
+var _CanvasDrawable = require("./CanvasDrawable");
 
-var _HappySandwichMaker2 = _interopRequireDefault(_HappySandwichMaker);
+var _CanvasDrawable2 = _interopRequireDefault(_CanvasDrawable);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -42,7 +42,7 @@ var HappySandwichMakerExample = function (_Component) {
   _createClass(HappySandwichMakerExample, [{
     key: "render",
     value: function render() {
-      return _react2.default.createElement(_HappySandwichMaker2.default, { width: 1000,
+      return _react2.default.createElement(_CanvasDrawable2.default, { width: 1000,
         height: 400,
         style: style
       });
@@ -60,13 +60,13 @@ exports.default = HappySandwichMakerExample;
     return;
   }
 
-  __REACT_HOT_LOADER__.register(style, "style", "src/CanvasDrawable.example.js");
+  __REACT_HOT_LOADER__.register(style, "style", "src/HappySandwichMaker.example.js");
 
-  __REACT_HOT_LOADER__.register(number, "number", "src/CanvasDrawable.example.js");
+  __REACT_HOT_LOADER__.register(number, "number", "src/HappySandwichMaker.example.js");
 
-  __REACT_HOT_LOADER__.register(string, "string", "src/CanvasDrawable.example.js");
+  __REACT_HOT_LOADER__.register(string, "string", "src/HappySandwichMaker.example.js");
 
-  __REACT_HOT_LOADER__.register(HappySandwichMakerExample, "HappySandwichMakerExample", "src/CanvasDrawable.example.js");
+  __REACT_HOT_LOADER__.register(HappySandwichMakerExample, "HappySandwichMakerExample", "src/HappySandwichMaker.example.js");
 })();
 
 ;
