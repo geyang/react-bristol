@@ -17,7 +17,7 @@ export default class Canvas extends Component {
     return this._pageOffset;
   }
 
-  set pageOffset(value) {
+  clearPageOffset() {
     this._pageOffset = undefined;
     return this.pageOffset
   }

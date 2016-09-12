@@ -3,7 +3,7 @@ import React, {Component, PropTypes} from "react";
 import CanvasDrawable from "./CanvasDrawable";
 
 const style = {
-  border: ' 1px solid pink'
+  border: ' 30px solid pink'
 };
 var {number, string} = PropTypes;
 export default class HappySandwichMakerExample extends Component {

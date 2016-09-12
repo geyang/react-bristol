@@ -1,22 +1,25 @@
 import React, {Component, PropTypes} from 'react';
 import autobind from 'autobind-decorator';
 import Canvas from './Canvas';
-import {Flex, FlexItem} from 'layout-components';
+import simplePen from './extensions/simplePen';
 
-var {func, bool, string, oneOf} = PropTypes;
+var {number, func, bool, string, oneOf} = PropTypes;
 /**
  * description of the component
  */
 export default class HappySandwichMaker extends Component {
 
-  static propTypes = {};
+  static propTypes = {
+    scaleRatio: number
+  };
 
-  static defaultProps = {};
+  static defaultProps = {
+    scaleRatio: 3
+  };
 
   componentWillMount() {
-    this._logs = [];
-    this._paths = {};
-    this.setState({logs: this._logs});
+    this._activePaths = {};
+    this._allPaths = [];
   }
 
   componentDidMount() {
@@ -28,7 +31,7 @@ export default class HappySandwichMaker extends Component {
   genericHandler(event) {
     event.preventDefault();
     const {type, changedTouches} = event;
-    if (type === 'mousedown' || type === 'touchstart') this.canvas.pageOffset = {};
+    // strokeChange
     if (changedTouches && changedTouches.length >= 1 && typeof changedTouches[0].force !== 'undefined') {
       Array.from(changedTouches)
         .forEach(
@@ -39,83 +42,64 @@ export default class HappySandwichMaker extends Component {
       let {pageX, pageY} = event;
       this.recordTouch({eventType: type, id: 'mouse', pageX, pageY});
     }
-    this._throttledDraw();
+  }
+
+  getDressedCursorPosition(pageX, pageY, refreshOffset = false) {
+    if (refreshOffset) this.canvas.clearPageOffset();
+    return {
+      x: pageX - this.canvas.pageOffset.left - (this.canvas.pageOffset.width - this.props.width) / 2,
+      y: pageY - this.canvas.pageOffset.top - (this.canvas.pageOffset.height - this.props.height) / 2
+    };
   }
 
   recordTouch({eventType, id, pageX, pageY, force, tilt}) {
-    const x = pageX - this.canvas.pageOffset.left;
-    const y = pageY - this.canvas.pageOffset.top;
-
+    let x, y;
     switch (eventType) {
       case 'mousedown':
       case 'touchstart':
+        ({x, y} = this.getDressedCursorPosition(pageX, pageY, true));
         this.startPath({id, x, y, force, tilt});
         break;
       case 'mousemove':
       case 'touchmove':
+        ({x, y} = this.getDressedCursorPosition(pageX, pageY));
         this.appendPathPoint({id, x, y, force, tilt});
         break;
       case 'mouseup':
       case 'touchend':
-        this.completePath({id, x, y, force, tilt});
+        ({x, y} = this.getDressedCursorPosition(pageX, pageY));
+        this.appendPathPoint({id, x, y, force, tilt});
+        setTimeout(() => this.completePath({id}), 16);
         break;
     }
+    this.drawActivePaths();
   }
 
   startPath({id, x, y, force, tilt}) {
-    this._paths[id] = [{x, y, force, tilt}];
+    this._activePaths[id] = [{x, y, force, tilt}];
   }
 
   appendPathPoint({id, x, y, force, tilt}) {
-    if (!this._paths[id]) return;
-    this._paths[id].push({x, y, force, tilt});
+    if (!this._activePaths[id]) return;
+    this._activePaths[id].push({x, y, force, tilt});
   }
 
-  completePath({id, x, y, force, tilt}) {
-    this.appendPathPoint({id, x, y, force, tilt});
-    setTimeout(() => delete this._paths[id], 16);
+  completePath({id}) {
+    this._allPaths.push(this._activePaths[id]);
+    delete this._activePaths[id];
   }
 
-  @autobind
-  clearLogs() {
-    this._logs = [];
-    this.setState({logs: this._logs});
-  }
-
-  @autobind
-  log(data) {
-    const {x, y} = (data.position || {});
-    this._logs.push(data);
-    this.setState({logs: this._logs});
-  }
-
-  draw(context, path, stylus) {
-    if (!path) return;
-    context.beginPath();
-    context.moveTo(path[0].x, path[0].y);
-    for (var i = 1; i < path.length; i++) {
-      let force = path.slice(-1)[0].force;
-      if (typeof force === 'undefined') force = 1;
-      context.lineTo(path[i].x, path[i].y);
-      context.lineWidth = force * 1;
-      context.strokeStyle = `rgba(40, 200, 255, ${force})`;
-      // context.quadraticCurveTo(20,100,10,20);
-    }
-    context.stroke();
-  }
-
-  _throttledDraw() {
-    for (let key in this._paths) {
-      const path = this._paths[key];
+  drawActivePaths() {
+    for (let key in this._activePaths) {
+      const path = this._activePaths[key];
       const context = this.activeContext;
       const {width, height} = this.props;
-      context.clearRect(0, 0, width, height);
-      this.draw(context, path)
+      simplePen(context, path)
     }
   }
 
   render() {
-    const {width, height, scale, offset, ..._props} = this.props;
+    const {width, height, scaleRatio, scale, offset, ..._props} = this.props;
     return (
       <Canvas ref="active"
               style={{border: '2px solid pink'}}
