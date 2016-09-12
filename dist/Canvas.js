@@ -48,11 +48,39 @@ var Canvas = (_temp = _class = function (_Component) {
       return this.pageOffset;
     }
   }, {
+    key: 'clear',
+    value: function clear() {
+      var _props2 = this.props;
+      var width = _props2.width;
+      var height = _props2.height;
+
+      this.context.clearRect(0, 0, width, height);
+    }
+  }, {
+    key: 'getImageData',
+    value: function getImageData() {
+      var _props3 = this.props;
+      var width = _props3.width;
+      var height = _props3.height;
+
+      return this.context.getImageData(0, 0, width, height);
+    }
+  }, {
+    key: 'saveImage',
+    value: function saveImage() {
+      this.image = this.getImageData();
+    }
+  }, {
+    key: 'putImage',
+    value: function putImage() {
+      return this.context.putImageData(this.paintStackImage, 0, 0);
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _props = _objectWithoutProperties(this.props, []);
 
-      return _react2.default.createElement('active', _props);
+      return _react2.default.createElement('canvas', _props);
     }
   }, {
     key: 'pageOffset',

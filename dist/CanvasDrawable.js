@@ -10,9 +10,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _desc, _value, _class, _class2, _temp;
-// import SimplePen from './extensions/simplePen';
-// const simplePen = SimplePen({color: 'blue', strokeWidth: 1});
-
 
 var _react = require('react');
 
@@ -26,9 +23,9 @@ var _Canvas = require('./Canvas');
 
 var _Canvas2 = _interopRequireDefault(_Canvas);
 
-var _calligraphyPen = require('./extensions/calligraphyPen');
+var _simplePen = require('./extensions/simplePen');
 
-var _calligraphyPen2 = _interopRequireDefault(_calligraphyPen);
+var _simplePen2 = _interopRequireDefault(_simplePen);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -69,7 +66,10 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
   return desc;
 }
 
-var pen = (0, _calligraphyPen2.default)({ color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 0 });
+var pen = (0, _simplePen2.default)({ color: 'blue', strokeWidth: 1 });
+// import CalligraphyPen from './extensions/calligraphyPen';
+// const pen = CalligraphyPen({color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 1});
+
 
 var number = _react.PropTypes.number;
 var func = _react.PropTypes.func;
@@ -99,7 +99,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
     key: 'componentDidMount',
     value: function componentDidMount() {
       this.active = this.refs['active'];
-      this.activeContext = this.active.context;
+      this.inactive = this.refs['inactive'];
       this.updatePaintStack();
     }
   }, {
@@ -232,47 +232,27 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var id = _ref5.id;
 
       // this need to go into a function
-      this._paintStack.push(this._activePaths[id]);
+      var path = this._activePaths[id];
+      this._paintStack.push(path);
       delete this._activePaths[id];
-      this.updatePaintStack();
+      this.patchPaintStack(path);
+      // this.updatePaintStack()
     }
   }, {
     key: 'draw',
     value: function draw() {
       // 0. clear
-      this.putImage();
+      this.active.clear();
       //2. draw active
       this.drawActivePaths();
     }
   }, {
-    key: 'clear',
-    value: function clear() {
-      var _props2 = this.props;
-      var width = _props2.width;
-      var height = _props2.height;
-      var renderRatio = _props2.renderRatio;
+    key: 'patchPaintStack',
+    value: function patchPaintStack(newPath) {
+      var save = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 
-      this.activeContext.clearRect(0, 0, width * renderRatio, height * renderRatio);
-    }
-  }, {
-    key: 'getImageData',
-    value: function getImageData() {
-      var _props3 = this.props;
-      var width = _props3.width;
-      var height = _props3.height;
-      var renderRatio = _props3.renderRatio;
-
-      return this.activeContext.getImageData(0, 0, width * renderRatio, height * renderRatio);
-    }
-  }, {
-    key: 'saveImage',
-    value: function saveImage() {
-      this.paintStackImage = this.getImageData();
-    }
-  }, {
-    key: 'putImage',
-    value: function putImage() {
-      return this.activeContext.putImageData(this.paintStackImage, 0, 0);
+      pen(this.inactive.context, newPath.data);
+      if (save) this.inactive.saveImage();
     }
   }, {
     key: 'updatePaintStack',
@@ -280,45 +260,46 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var _this4 = this;
 
       // this.putImage();
-      this.clear();
+      this.inactive.clear();
       this._paintStack.forEach(function (_ref6) {
         var data = _ref6.data;
 
         // todo: get pen info from path meta data next time.
-        pen(_this4.activeContext, data);
+        pen(_this4.inactive.context, data);
       });
-      this.saveImage();
+      this.inactive.saveImage();
     }
   }, {
     key: 'drawActivePaths',
     value: function drawActivePaths() {
       for (var key in this._activePaths) {
         var pathData = this._activePaths[key].data;
-        pen(this.activeContext, pathData);
+        pen(this.active.context, pathData);
       }
     }
   }, {
     key: 'render',
     value: function render() {
-      var _props4 = this.props;
-      var width = _props4.width;
-      var height = _props4.height;
-      var renderRatio = _props4.renderRatio;
-      var scale = _props4.scale;
-      var offset = _props4.offset;
-      var style = _props4.style;
+      var _props2 = this.props;
+      var width = _props2.width;
+      var height = _props2.height;
+      var renderRatio = _props2.renderRatio;
+      var scale = _props2.scale;
+      var offset = _props2.offset;
+      var style = _props2.style;
 
-      var _props = _objectWithoutProperties(_props4, ['width', 'height', 'renderRatio', 'scale', 'offset', 'style']);
+      var _props = _objectWithoutProperties(_props2, ['width', 'height', 'renderRatio', 'scale', 'offset', 'style']);
 
+      var canvasStyle = {
+        position: 'absolute',
+        top: 0, left: 0,
+        transform: 'scale(' + 1 / renderRatio + ', ' + 1 / renderRatio + ')' + ('translate(' + -width * renderRatio + 'px, ' + -height * renderRatio + 'px)')
+      };
       return _react2.default.createElement(
         'div',
         { style: _extends({ width: width, height: height, position: 'relative' }, style) },
         _react2.default.createElement(_Canvas2.default, _extends({ ref: 'active',
-          style: {
-            position: 'absolute',
-            top: 0, left: 0,
-            transform: 'scale(' + 1 / renderRatio + ', ' + 1 / renderRatio + ')' + ('translate(' + -width * renderRatio + 'px, ' + -height * renderRatio + 'px)')
-          },
+          style: canvasStyle,
           width: width * renderRatio,
           height: height * renderRatio,
           onMouseDown: this.genericHandler,
@@ -328,7 +309,12 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
           onTouchMove: this.genericHandler,
           onTouchEnd: this.genericHandler,
           onTouchCancel: this.genericHandler
-        }, _props))
+        }, _props)),
+        _react2.default.createElement(_Canvas2.default, { ref: 'inactive',
+          style: _extends({}, canvasStyle, { zIndex: -1 }),
+          width: width * renderRatio,
+          height: height * renderRatio
+        })
       );
     }
   }]);
