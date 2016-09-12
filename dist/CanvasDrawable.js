@@ -23,7 +23,9 @@ var _Canvas = require('./Canvas');
 
 var _Canvas2 = _interopRequireDefault(_Canvas);
 
-var _layoutComponents = require('layout-components');
+var _simplePen = require('./extensions/simplePen');
+
+var _simplePen2 = _interopRequireDefault(_simplePen);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -64,6 +66,7 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
   return desc;
 }
 
+var number = _react.PropTypes.number;
 var func = _react.PropTypes.func;
 var bool = _react.PropTypes.bool;
 var string = _react.PropTypes.string;
@@ -84,9 +87,8 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
   _createClass(HappySandwichMaker, [{
     key: 'componentWillMount',
     value: function componentWillMount() {
-      this._logs = [];
       this._activePaths = {};
-      this.setState({ logs: this._logs });
+      this._paintStack = [];
     }
   }, {
     key: 'componentDidMount',
@@ -102,8 +104,8 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       event.preventDefault();
       var type = event.type;
       var changedTouches = event.changedTouches;
+      // strokeChange
 
-      if (type === 'mousedown' || type === 'touchstart') this.canvas.pageOffset = {};
       if (changedTouches && changedTouches.length >= 1 && typeof changedTouches[0].force !== 'undefined') {
         Array.from(changedTouches).forEach(function (_ref) {
           var identifier = _ref.identifier;
@@ -119,11 +121,25 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
 
         this.recordTouch({ eventType: type, id: 'mouse', pageX: pageX, pageY: pageY });
       }
-      this._throttledDraw();
+    }
+  }, {
+    key: 'getDressedCursorPosition',
+    value: function getDressedCursorPosition(pageX, pageY) {
+      var refreshOffset = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
+      if (refreshOffset) this.canvas.clearPageOffset();
+      var renderRatio = this.props.renderRatio;
+
+      return {
+        x: (pageX - this.canvas.pageOffset.left - (this.canvas.pageOffset.width - this.props.width) / 2) * renderRatio,
+        y: (pageY - this.canvas.pageOffset.top - (this.canvas.pageOffset.height - this.props.height) / 2) * renderRatio
+      };
     }
   }, {
     key: 'recordTouch',
     value: function recordTouch(_ref2) {
+      var _this3 = this;
+
       var eventType = _ref2.eventType;
       var id = _ref2.id;
       var pageX = _ref2.pageX;
@@ -131,23 +147,41 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var force = _ref2.force;
       var tilt = _ref2.tilt;
 
-      var x = pageX - this.canvas.pageOffset.left;
-      var y = pageY - this.canvas.pageOffset.top;
-
+      var x = void 0,
+          y = void 0;
       switch (eventType) {
         case 'mousedown':
         case 'touchstart':
+          var _getDressedCursorPosi = this.getDressedCursorPosition(pageX, pageY, true);
+
+          x = _getDressedCursorPosi.x;
+          y = _getDressedCursorPosi.y;
+
           this.startPath({ id: id, x: x, y: y, force: force, tilt: tilt });
           break;
         case 'mousemove':
         case 'touchmove':
+          var _getDressedCursorPosi2 = this.getDressedCursorPosition(pageX, pageY);
+
+          x = _getDressedCursorPosi2.x;
+          y = _getDressedCursorPosi2.y;
+
           this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
           break;
         case 'mouseup':
         case 'touchend':
-          this.completePath({ id: id, x: x, y: y, force: force, tilt: tilt });
+          var _getDressedCursorPosi3 = this.getDressedCursorPosition(pageX, pageY);
+
+          x = _getDressedCursorPosi3.x;
+          y = _getDressedCursorPosi3.y;
+
+          this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
+          setTimeout(function () {
+            return _this3.completePath({ id: id });
+          }, 16);
           break;
       }
+      this.draw();
     }
   }, {
     key: 'startPath',
@@ -175,94 +209,76 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
   }, {
     key: 'completePath',
     value: function completePath(_ref5) {
-      var _this3 = this;
-
       var id = _ref5.id;
-      var x = _ref5.x;
-      var y = _ref5.y;
-      var force = _ref5.force;
-      var tilt = _ref5.tilt;
 
-      this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
-      setTimeout(function () {
-        return delete _this3._activePaths[id];
-      }, 16);
+      // this need to go into a function
+      this._paintStack.push(this._activePaths[id]);
+      delete this._activePaths[id];
     }
   }, {
-    key: 'clearLogs',
-    value: function clearLogs() {
-      this._logs = [];
-      this.setState({ logs: this._logs });
-    }
-  }, {
-    key: 'log',
-    value: function log(data) {
-      var _ref6 = data.position || {};
+    key: 'draw',
+    value: function draw() {
+      //1. draw existing
+      //2. draw active
+      this.drawActivePaths();
+      //3. rescale
+      // todo: use inactiveContext
+      var renderRatio = this.props.renderRatio;
+      // console.log(renderRatio);
 
-      var x = _ref6.x;
-      var y = _ref6.y;
-
-      this._logs.push(data);
-      this.setState({ logs: this._logs });
-    }
-  }, {
-    key: 'simplePen',
-    value: function draw(context, path, stylus) {
-      if (!path) return;
-      context.beginPath();
-      context.moveTo(path[0].x, path[0].y);
-      for (var i = 1; i < path.length; i++) {
-        var force = path.slice(-1)[0].force;
-        if (typeof force === 'undefined') force = 1;
-        context.lineTo(path[i].x, path[i].y);
-        context.lineWidth = force * 1;
-        context.strokeStyle = 'rgba(40, 200, 255, ' + force + ')';
-        // context.quadraticCurveTo(20,100,10,20);
-      }
-      context.stroke();
+      this.activeContext.scale(1, 1);
     }
   }, {
     key: 'drawActivePaths',
-    value: function _throttledDraw() {
+    value: function drawActivePaths() {
       for (var key in this._activePaths) {
         var path = this._activePaths[key];
         var context = this.activeContext;
-        var _props2 = this.props;
-        var width = _props2.width;
-        var height = _props2.height;
-
-        context.clearRect(0, 0, width, height);
-        this.draw(context, path);
+        (0, _simplePen2.default)(context, path);
       }
     }
   }, {
     key: 'render',
     value: function render() {
-      var _props3 = this.props;
-      var width = _props3.width;
-      var height = _props3.height;
-      var scale = _props3.scale;
-      var offset = _props3.offset;
+      var _props2 = this.props;
+      var width = _props2.width;
+      var height = _props2.height;
+      var renderRatio = _props2.renderRatio;
+      var scale = _props2.scale;
+      var offset = _props2.offset;
+      var style = _props2.style;
 
-      var _props = _objectWithoutProperties(_props3, ['width', 'height', 'scale', 'offset']);
+      var _props = _objectWithoutProperties(_props2, ['width', 'height', 'renderRatio', 'scale', 'offset', 'style']);
 
-      return _react2.default.createElement(_Canvas2.default, _extends({ ref: 'active',
-        style: { border: '2px solid pink' },
-        width: width,
-        height: height,
-        onMouseDown: this.genericHandler,
-        onMouseMove: this.genericHandler,
-        onMouseUp: this.genericHandler,
-        onTouchStart: this.genericHandler,
-        onTouchMove: this.genericHandler,
-        onTouchEnd: this.genericHandler,
-        onTouchCancel: this.genericHandler
-      }, _props));
+      return _react2.default.createElement(
+        'div',
+        { style: _extends({ width: width, height: height }, style) },
+        _react2.default.createElement(_Canvas2.default, _extends({ ref: 'active',
+          style: {
+            transform: 'scale(' + 1 / renderRatio + ', ' + 1 / renderRatio + ')' + ('translate(' + -width * renderRatio + 'px, ' + -height * renderRatio + 'px)')
+          },
+          width: width * renderRatio,
+          height: height * renderRatio,
+          onMouseDown: this.genericHandler,
+          onMouseMove: this.genericHandler,
+          onMouseUp: this.genericHandler,
+          onTouchStart: this.genericHandler,
+          onTouchMove: this.genericHandler,
+          onTouchEnd: this.genericHandler,
+          onTouchCancel: this.genericHandler
+        }, _props))
+      );
     }
   }]);
 
   return HappySandwichMaker;
-}(_react.Component), _class2.propTypes = {}, _class2.defaultProps = {}, _temp), (_applyDecoratedDescriptor(_class.prototype, 'genericHandler', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'genericHandler'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'clearLogs', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'clearLogs'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'log', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'log'), _class.prototype)), _class);
+}(_react.Component), _class2.propTypes = {
+  width: number,
+  height: number,
+  renderRatio: number
+}, _class2.defaultProps = {
+  renderRatio: 3
+}, _temp), (_applyDecoratedDescriptor(_class.prototype, 'genericHandler', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'genericHandler'), _class.prototype)), _class);
 exports.default = HappySandwichMaker;
 ;
 
@@ -270,6 +286,8 @@ exports.default = HappySandwichMaker;
   if (typeof __REACT_HOT_LOADER__ === 'undefined') {
     return;
   }
+
+  __REACT_HOT_LOADER__.register(number, 'number', 'src/CanvasDrawable.js');
 
   __REACT_HOT_LOADER__.register(func, 'func', 'src/CanvasDrawable.js');
 

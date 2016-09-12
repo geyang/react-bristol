@@ -25,7 +25,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 var style = {
-  border: ' 1px solid pink'
+  border: '10px solid pink'
 };
 var number = _react.PropTypes.number;
 var string = _react.PropTypes.string;

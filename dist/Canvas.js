@@ -42,6 +42,12 @@ var Canvas = (_temp = _class = function (_Component) {
       this.context = this.nativeElement.getContext('2d');
     }
   }, {
+    key: 'clearPageOffset',
+    value: function clearPageOffset() {
+      this._pageOffset = undefined;
+      return this.pageOffset;
+    }
+  }, {
     key: 'render',
     value: function render() {
       var _props = _objectWithoutProperties(this.props, []);
@@ -54,10 +60,6 @@ var Canvas = (_temp = _class = function (_Component) {
       if (this._pageOffset) return this._pageOffset;
       this._pageOffset = this.nativeElement.getBoundingClientRect();
       return this._pageOffset;
-    },
-    set: function set(value) {
-      this._pageOffset = undefined;
-      return this.pageOffset;
     }
   }]);
 
