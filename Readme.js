@@ -46,7 +46,7 @@ function Readme(_ref) {
   return _react2.default.createElement(
     _reactMarkdownit2.default,
     { stripIndent: true },
-    "\n      # React Canvas Paint Demo\n\n      [![github](https://img.shields.io/github/downloads/episodeyang/react-bristol/total.svg?style=flat-square&maxAge=2592000)]()\n\n      A HTML5 canvas component that allows you to draw inside the browser.\n\n      ## Usage\n\n      [ ] todo: need to publish as npm module.\n\n      ## Develop\n\n      After cloning from gitHub, you can run the example by doing\n      ~~~shell\n      npm run serve-docs\n      ~~~\n\n      And then open your browser at [http://localhost:5000](http://localhost:5000).\n\n      ## Live Demo: `Bristol`\n      showing basic pointer events and force detection (with force touch and apple pencil)\n      ",
+    "\n      # React Canvas Paint Demo\n\n      [![github](https://img.shields.io/github/downloads/episodeyang/react-bristol/total.svg?style=flat-square&maxAge=2592000)]()\n\n      A HTML5 canvas component that allows you to simplePen inside the browser.\n\n      ## Usage\n\n      [ ] todo: need to publish as npm module.\n\n      ## Develop\n\n      After cloning from gitHub, you can run the example by doing\n      ~~~shell\n      npm run serve-docs\n      ~~~\n\n      And then open your browser at [http://localhost:5000](http://localhost:5000).\n\n      ## Live Demo: `Bristol`\n      showing basic pointer events and force detection (with force touch and apple pencil)\n      ",
     _react2.default.createElement(_HappySandwichMaker2.default, null),
     "### Props",
     "This table below is generated automatically",
