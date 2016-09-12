@@ -1,7 +1,11 @@
 import React, {Component, PropTypes} from 'react';
 import autobind from 'autobind-decorator';
 import Canvas from './Canvas';
-import simplePen from './extensions/simplePen';
+// import SimplePen from './extensions/simplePen';
+// const simplePen = SimplePen({color: 'blue', strokeWidth: 1});
+import CalligraphyPen from './extensions/calligraphyPen';
+const pen = CalligraphyPen({color: 'blue', strokeWidth: 10,  angle: -45, epsilon: 0.1, blur: 0});
+
 
 var {number, func, bool, string, oneOf} = PropTypes;
 /**
@@ -79,12 +83,18 @@ export default class HappySandwichMaker extends Component {
   }
 
   startPath({id, x, y, force, tilt}) {
-    this._activePaths[id] = [{x, y, force, tilt}];
+    this._activePaths[id] = {
+      pressureSensitive: !!force, // 0 => false, undefined => false, 0.20 => true
+      data: []
+    };
+    this.appendPathPoint({id, x, y, force, tilt});
   }
 
   appendPathPoint({id, x, y, force, tilt}) {
-    if (!this._activePaths[id]) return;
-    this._activePaths[id].push({x, y, force, tilt});
+    const path = this._activePaths[id];
+    if (!path) return;
+    else if (!path.pressureSensitive) force = 1;
+    path.data.push({x, y, force, tilt});
   }
 
   completePath({id}) {
@@ -97,18 +107,13 @@ export default class HappySandwichMaker extends Component {
     //1. draw existing
     //2. draw active
     this.drawActivePaths();
-    //3. rescale
-    // todo: use inactiveContext
-    const {renderRatio} = this.props;
-    // console.log(renderRatio);
-    this.activeContext.scale(1, 1);
   }
 
   drawActivePaths() {
     for (let key in this._activePaths) {
-      const path = this._activePaths[key];
+      const pathData = this._activePaths[key].data;
       const context = this.activeContext;
-      simplePen(context, path)
+      pen(context, pathData)
     }
   }
 
