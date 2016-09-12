@@ -7,8 +7,6 @@ exports.default = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _desc, _value, _class, _class2, _temp;
@@ -20,6 +18,10 @@ var _react2 = _interopRequireDefault(_react);
 var _autobindDecorator = require('autobind-decorator');
 
 var _autobindDecorator2 = _interopRequireDefault(_autobindDecorator);
+
+var _Canvas = require('./Canvas');
+
+var _Canvas2 = _interopRequireDefault(_Canvas);
 
 var _layoutComponents = require('layout-components');
 
@@ -87,12 +89,25 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
     }
   }, {
     key: 'genericHandler',
-    value: function genericHandler(e) {
-      var type = e.type;
-      var touches = e.touches;
+    value: function genericHandler(event) {
+      var type = event.type;
+      var touches = event.touches;
 
-      var pressure = void 0;
-      if (touches && touches.length >= 1 && _typeof(touches[0].pressure)) this.log({ type: type, touches: touches, pressure: pressure });
+      var force = void 0,
+          x = void 0,
+          y = void 0;
+      if (touches && touches.length >= 1 && typeof touches[0].force !== 'undefined') {
+        force = touches[0].force;
+        var _touches$ = touches[0];
+        x = _touches$.clientX;
+        y = _touches$.clientY;
+      } else if (type.match(/^mouse/)) {
+        x = event.clientX;
+        y = event.clientY;
+
+        console.log(event);
+      }
+      this.log({ type: type, touches: touches, force: force, position: { x: x, y: y } });
     }
   }, {
     key: 'clearLogs',
@@ -103,6 +118,12 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
   }, {
     key: 'log',
     value: function log(data) {
+      var _ref = data.touch || {};
+
+      var pageX = _ref.pageX;
+      var pageY = _ref.pageY;
+
+      console.log({ pageX: pageX, pageY: pageY });
       this._logs.push(data);
       this.setState({ logs: this._logs });
     }
@@ -121,11 +142,11 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
 
       return _react2.default.createElement(
         _layoutComponents.Flex,
-        { row: true },
-        _react2.default.createElement(_layoutComponents.FlexItem, _extends({ fluid: true, comp: 'canvas',
-          width: width,
-          height: height,
+        { row: true,
+          style: { width: width, height: height } },
+        _react2.default.createElement(_layoutComponents.FlexItem, _extends({ fluid: true, component: _Canvas2.default, style: { border: '2px solid pink' },
           onMouseDown: this.genericHandler,
+          onMouseMove: this.genericHandler,
           onMouseUp: this.genericHandler,
           onTouchStart: this.genericHandler,
           onTouchMove: this.genericHandler,
@@ -157,12 +178,17 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
                 _react2.default.createElement(
                   'th',
                   null,
-                  'First finger'
+                  'X'
                 ),
                 _react2.default.createElement(
                   'th',
                   null,
-                  'pressure'
+                  'Y'
+                ),
+                _react2.default.createElement(
+                  'th',
+                  null,
+                  'force'
                 )
               )
             ),
@@ -181,12 +207,17 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
                   _react2.default.createElement(
                     'td',
                     null,
-                    log.touches
+                    log.position ? log.position.x : ''
                   ),
                   _react2.default.createElement(
                     'td',
                     null,
-                    log.touches ? log.pressure : 'x'
+                    log.position ? log.position.y : ''
+                  ),
+                  _react2.default.createElement(
+                    'td',
+                    null,
+                    log.touches ? log.force : 'x'
                   )
                 );
               })
