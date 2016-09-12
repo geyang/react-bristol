@@ -100,6 +100,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
     value: function componentDidMount() {
       this.canvas = this.refs['active'];
       this.activeContext = this.canvas.context;
+      this.updatePaintStack();
     }
   }, {
     key: 'genericHandler',
@@ -233,35 +234,81 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       // this need to go into a function
       this._paintStack.push(this._activePaths[id]);
       delete this._activePaths[id];
+      this.updatePaintStack();
     }
   }, {
     key: 'draw',
     value: function draw() {
-      //1. draw existing
+      // 0. clear
+      this.putImage();
       //2. draw active
       this.drawActivePaths();
+    }
+  }, {
+    key: 'clear',
+    value: function clear() {
+      var _props2 = this.props;
+      var width = _props2.width;
+      var height = _props2.height;
+      var renderRatio = _props2.renderRatio;
+
+      this.activeContext.clearRect(0, 0, width * renderRatio, height * renderRatio);
+    }
+  }, {
+    key: 'getImageData',
+    value: function getImageData() {
+      var _props3 = this.props;
+      var width = _props3.width;
+      var height = _props3.height;
+      var renderRatio = _props3.renderRatio;
+
+      return this.activeContext.getImageData(0, 0, width * renderRatio, height * renderRatio);
+    }
+  }, {
+    key: 'saveImage',
+    value: function saveImage() {
+      this.paintStackImage = this.getImageData();
+    }
+  }, {
+    key: 'putImage',
+    value: function putImage() {
+      return this.activeContext.putImageData(this.paintStackImage, 0, 0);
+    }
+  }, {
+    key: 'updatePaintStack',
+    value: function updatePaintStack() {
+      var _this4 = this;
+
+      // this.putImage();
+      this.clear();
+      this._paintStack.forEach(function (_ref6) {
+        var data = _ref6.data;
+
+        // todo: get pen info from path meta data next time.
+        pen(_this4.activeContext, data);
+      });
+      this.saveImage();
     }
   }, {
     key: 'drawActivePaths',
     value: function drawActivePaths() {
       for (var key in this._activePaths) {
         var pathData = this._activePaths[key].data;
-        var context = this.activeContext;
-        pen(context, pathData);
+        pen(this.activeContext, pathData);
       }
     }
   }, {
     key: 'render',
     value: function render() {
-      var _props2 = this.props;
-      var width = _props2.width;
-      var height = _props2.height;
-      var renderRatio = _props2.renderRatio;
-      var scale = _props2.scale;
-      var offset = _props2.offset;
-      var style = _props2.style;
+      var _props4 = this.props;
+      var width = _props4.width;
+      var height = _props4.height;
+      var renderRatio = _props4.renderRatio;
+      var scale = _props4.scale;
+      var offset = _props4.offset;
+      var style = _props4.style;
 
-      var _props = _objectWithoutProperties(_props2, ['width', 'height', 'renderRatio', 'scale', 'offset', 'style']);
+      var _props = _objectWithoutProperties(_props4, ['width', 'height', 'renderRatio', 'scale', 'offset', 'style']);
 
       return _react2.default.createElement(
         'div',

@@ -30,7 +30,7 @@ function CalligraphyPen(_ref) {
   var offsetX = strokeWidth / 2 * cos(PI * angle / 180);
   var offsetY = strokeWidth / 2 * sin(PI * angle / 180);
 
-  return function calligraphyPen(context, pathData) {
+  function calligraphyPen(context, pathData) {
     if (!pathData) return;
     context.beginPath();
     context.lineWidth = strokeWidth;
@@ -45,8 +45,8 @@ function CalligraphyPen(_ref) {
 
       // const {x: _x, y: _y} = pathData[ind - 1] || {x, y};
       // const theta = arctan((y - _y) / (x - _x));
-      points.push({ x: x + max(offsetX, strokeWidth / 2 * epsilon, 1), y: max(y + offsetY, strokeWidth / 2 * epsilon, 1) });
-      points.unshift({ x: x - max(offsetX, strokeWidth / 2 * epsilon, 1), y: y - max(offsetY, strokeWidth / 2 * epsilon, 1) });
+      points.push({ x: x + max(offsetX, strokeWidth / 2 * epsilon, 0.5), y: max(y + offsetY, strokeWidth / 2 * epsilon, 0.5) });
+      points.unshift({ x: x - max(offsetX, strokeWidth / 2 * epsilon, 0.5), y: y - max(offsetY, strokeWidth / 2 * epsilon, 0.5) });
     });
 
     context.moveTo(points[0].x, points[0].y);
@@ -60,7 +60,8 @@ function CalligraphyPen(_ref) {
     }
     context.closePath();
     context.fill();
-  };
+  }
+  return calligraphyPen;
 }
 ;
 
