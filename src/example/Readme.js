@@ -9,7 +9,7 @@ import PropsTable from "react-component-props-table";
 
 import HappySandwichMakerExample from "../HappySandwichMaker.example";
 import HappySandwichMakerSource from "!!raw!../HappySandwichMaker.example";
-import HappySandwichMakerAST from "!!react-docgen!../HappySandwichMaker";
+import HappySandwichMakerAST from "!!react-docgen!../CanvasDrawable";
 
 export default function Readme({}) {
   return (

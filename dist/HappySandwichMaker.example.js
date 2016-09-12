@@ -60,13 +60,13 @@ exports.default = HappySandwichMakerExample;
     return;
   }
 
-  __REACT_HOT_LOADER__.register(style, "style", "src/HappySandwichMaker.example.js");
+  __REACT_HOT_LOADER__.register(style, "style", "src/CanvasDrawable.example.js");
 
-  __REACT_HOT_LOADER__.register(number, "number", "src/HappySandwichMaker.example.js");
+  __REACT_HOT_LOADER__.register(number, "number", "src/CanvasDrawable.example.js");
 
-  __REACT_HOT_LOADER__.register(string, "string", "src/HappySandwichMaker.example.js");
+  __REACT_HOT_LOADER__.register(string, "string", "src/CanvasDrawable.example.js");
 
-  __REACT_HOT_LOADER__.register(HappySandwichMakerExample, "HappySandwichMakerExample", "src/HappySandwichMaker.example.js");
+  __REACT_HOT_LOADER__.register(HappySandwichMakerExample, "HappySandwichMakerExample", "src/CanvasDrawable.example.js");
 })();
 
 ;

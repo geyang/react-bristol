@@ -26,51 +26,53 @@ export default class HappySandwichMaker extends Component {
 
   @autobind
   genericHandler(event) {
-    const {type, touches} = event;
-    let pageX, pageY, force, tilt;
-    if (touches && touches.length >= 1 && typeof touches[0].force !== 'undefined') {
-      ({pageX, pageY, force, tilt} = touches[0]);
+    event.preventDefault();
+    const {type, changedTouches} = event;
+    if (type === 'mousedown' || type === 'touchstart') this.canvas.pageOffset = {};
+    if (changedTouches && changedTouches.length >= 1 && typeof changedTouches[0].force !== 'undefined') {
+      Array.from(changedTouches)
+        .forEach(
+          ({identifier, pageX, pageY, force, tilt}) =>
+            this.recordTouch({eventType: type, id: identifier, pageX, pageY, force, tilt})
+        );
     } else if (type.match(/^mouse/)) {
-      ({pageX, pageY} = event);
-    }
-    const x = pageX - this.canvas.pageOffset.left;
-    const y = pageY - this.canvas.pageOffset.top;
-
-    switch (type) {
-      case 'mousedown':
-        this.startDrawing({id: 'mouse', x, y});
-        break;
-      case 'touchstart':
-        this.startDrawing({id: touch.identifier, x, y, force, tilt});
-        break;
-      case 'mousemove':
-        this.appendDrawing({id: 'mouse', x, y});
-        break;
-      case 'touchmove':
-        this.appendDrawing({id: touch.identifier, x, y, force, tilt});
-        break;
-      case 'mouseup':
-        this.endDrawing({id: 'mouse', x, y});
-        break;
-      case 'touchend':
-        this.endDrawing({id: touch.identifier, x, y, force, tilt});
-        console.log('touchend', x, y);
-        break;
+      let {pageX, pageY} = event;
+      this.recordTouch({eventType: type, id: 'mouse', pageX, pageY});
     }
     this._throttledDraw();
   }
 
-  startDrawing({id, x, y, force, tilt}) {
+  recordTouch({eventType, id, pageX, pageY, force, tilt}) {
+    const x = pageX - this.canvas.pageOffset.left;
+    const y = pageY - this.canvas.pageOffset.top;
+
+    switch (eventType) {
+      case 'mousedown':
+      case 'touchstart':
+        this.startPath({id, x, y, force, tilt});
+        break;
+      case 'mousemove':
+      case 'touchmove':
+        this.appendPathPoint({id, x, y, force, tilt});
+        break;
+      case 'mouseup':
+      case 'touchend':
+        this.completePath({id, x, y, force, tilt});
+        break;
+    }
+  }
+
+  startPath({id, x, y, force, tilt}) {
     this._paths[id] = [{x, y, force, tilt}];
   }
 
-  appendDrawing({id, x, y, force, tilt}) {
+  appendPathPoint({id, x, y, force, tilt}) {
     if (!this._paths[id]) return;
     this._paths[id].push({x, y, force, tilt});
   }
 
-  endDrawing({id, x, y, force, tilt}) {
-    this.appendDrawing({id, x, y, force, tilt});
+  completePath({id, x, y, force, tilt}) {
+    this.appendPathPoint({id, x, y, force, tilt});
     setTimeout(() => delete this._paths[id], 16);
   }
 
@@ -87,15 +89,16 @@ export default class HappySandwichMaker extends Component {
     this.setState({logs: this._logs});
   }
 
-  draw(path, stylus) {
+  draw(context, path, stylus) {
     if (!path) return;
-    let context = this.activeContext;
     context.beginPath();
-    context.lineWidth = 1;
-    context.strokeStyle = "red";
     context.moveTo(path[0].x, path[0].y);
     for (var i = 1; i < path.length; i++) {
+      let force = path.slice(-1)[0].force;
+      if (typeof force === 'undefined') force = 1;
       context.lineTo(path[i].x, path[i].y);
+      context.lineWidth = force * 1;
+      context.strokeStyle = `rgba(40, 200, 255, ${force})`;
       // context.quadraticCurveTo(20,100,10,20);
     }
     context.stroke();
@@ -104,7 +107,10 @@ export default class HappySandwichMaker extends Component {
   _throttledDraw() {
     for (let key in this._paths) {
       const path = this._paths[key];
-      this.draw(path)
+      const context = this.activeContext;
+      const {width, height} = this.props;
+      context.clearRect(0, 0, width, height);
+      this.draw(context, path)
     }
   }
 

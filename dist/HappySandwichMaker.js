@@ -141,7 +141,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       this._throttledDraw();
     }
   }, {
-    key: 'startDrawing',
+    key: 'startPath',
     value: function startDrawing(_ref) {
       var id = _ref.id;
       var x = _ref.x;
@@ -152,7 +152,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       this._paths[id] = [{ x: x, y: y, force: force, tilt: tilt }];
     }
   }, {
-    key: 'appendDrawing',
+    key: 'appendPathPoint',
     value: function appendDrawing(_ref2) {
       var id = _ref2.id;
       var x = _ref2.x;
@@ -164,7 +164,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       this._paths[id].push({ x: x, y: y, force: force, tilt: tilt });
     }
   }, {
-    key: 'endDrawing',
+    key: 'completePath',
     value: function endDrawing(_ref3) {
       var _this2 = this;
 
@@ -255,15 +255,15 @@ exports.default = HappySandwichMaker;
     return;
   }
 
-  __REACT_HOT_LOADER__.register(func, 'func', 'src/HappySandwichMaker.js');
+  __REACT_HOT_LOADER__.register(func, 'func', 'src/CanvasDrawable.js');
 
-  __REACT_HOT_LOADER__.register(bool, 'bool', 'src/HappySandwichMaker.js');
+  __REACT_HOT_LOADER__.register(bool, 'bool', 'src/CanvasDrawable.js');
 
-  __REACT_HOT_LOADER__.register(string, 'string', 'src/HappySandwichMaker.js');
+  __REACT_HOT_LOADER__.register(string, 'string', 'src/CanvasDrawable.js');
 
-  __REACT_HOT_LOADER__.register(oneOf, 'oneOf', 'src/HappySandwichMaker.js');
+  __REACT_HOT_LOADER__.register(oneOf, 'oneOf', 'src/CanvasDrawable.js');
 
-  __REACT_HOT_LOADER__.register(HappySandwichMaker, 'HappySandwichMaker', 'src/HappySandwichMaker.js');
+  __REACT_HOT_LOADER__.register(HappySandwichMaker, 'HappySandwichMaker', 'src/CanvasDrawable.js');
 })();
 
 ;
