@@ -85,7 +85,14 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
     key: 'componentWillMount',
     value: function componentWillMount() {
       this._logs = [];
+      this._paths = {};
       this.setState({ logs: this._logs });
+    }
+  }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.canvas = this.refs['active'];
+      this.activeContext = this.canvas.context;
     }
   }, {
     key: 'genericHandler',
@@ -93,21 +100,84 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var type = event.type;
       var touches = event.touches;
 
-      var force = void 0,
-          x = void 0,
-          y = void 0;
+      var pageX = void 0,
+          pageY = void 0,
+          force = void 0,
+          tilt = void 0;
       if (touches && touches.length >= 1 && typeof touches[0].force !== 'undefined') {
-        force = touches[0].force;
         var _touches$ = touches[0];
-        x = _touches$.clientX;
-        y = _touches$.clientY;
+        pageX = _touches$.pageX;
+        pageY = _touches$.pageY;
+        force = _touches$.force;
+        tilt = _touches$.tilt;
       } else if (type.match(/^mouse/)) {
-        x = event.clientX;
-        y = event.clientY;
-
-        console.log(event);
+        pageX = event.pageX;
+        pageY = event.pageY;
       }
-      this.log({ type: type, touches: touches, force: force, position: { x: x, y: y } });
+      var x = pageX - this.canvas.pageOffset.left;
+      var y = pageY - this.canvas.pageOffset.top;
+
+      switch (type) {
+        case 'mousedown':
+          this.startDrawing({ id: 'mouse', x: x, y: y });
+          break;
+        case 'touchstart':
+          this.startDrawing({ id: touch.identifier, x: x, y: y, force: force, tilt: tilt });
+          break;
+        case 'mousemove':
+          this.appendDrawing({ id: 'mouse', x: x, y: y });
+          break;
+        case 'touchmove':
+          this.appendDrawing({ id: touch.identifier, x: x, y: y, force: force, tilt: tilt });
+          break;
+        case 'mouseup':
+          this.endDrawing({ id: 'mouse', x: x, y: y });
+          break;
+        case 'touchend':
+          this.endDrawing({ id: touch.identifier, x: x, y: y, force: force, tilt: tilt });
+          console.log('touchend', x, y);
+          break;
+      }
+      this._throttledDraw();
+    }
+  }, {
+    key: 'startDrawing',
+    value: function startDrawing(_ref) {
+      var id = _ref.id;
+      var x = _ref.x;
+      var y = _ref.y;
+      var force = _ref.force;
+      var tilt = _ref.tilt;
+
+      this._paths[id] = [{ x: x, y: y, force: force, tilt: tilt }];
+    }
+  }, {
+    key: 'appendDrawing',
+    value: function appendDrawing(_ref2) {
+      var id = _ref2.id;
+      var x = _ref2.x;
+      var y = _ref2.y;
+      var force = _ref2.force;
+      var tilt = _ref2.tilt;
+
+      if (!this._paths[id]) return;
+      this._paths[id].push({ x: x, y: y, force: force, tilt: tilt });
+    }
+  }, {
+    key: 'endDrawing',
+    value: function endDrawing(_ref3) {
+      var _this2 = this;
+
+      var id = _ref3.id;
+      var x = _ref3.x;
+      var y = _ref3.y;
+      var force = _ref3.force;
+      var tilt = _ref3.tilt;
+
+      this.appendDrawing({ id: id, x: x, y: y, force: force, tilt: tilt });
+      setTimeout(function () {
+        return delete _this2._paths[id];
+      }, 16);
     }
   }, {
     key: 'clearLogs',
@@ -118,14 +188,36 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
   }, {
     key: 'log',
     value: function log(data) {
-      var _ref = data.touch || {};
+      var _ref4 = data.position || {};
 
-      var pageX = _ref.pageX;
-      var pageY = _ref.pageY;
+      var x = _ref4.x;
+      var y = _ref4.y;
 
-      console.log({ pageX: pageX, pageY: pageY });
       this._logs.push(data);
       this.setState({ logs: this._logs });
+    }
+  }, {
+    key: 'draw',
+    value: function draw(path, stylus) {
+      if (!path) return;
+      var context = this.activeContext;
+      context.beginPath();
+      context.lineWidth = 1;
+      context.strokeStyle = "red";
+      context.moveTo(path[0].x, path[0].y);
+      for (var i = 1; i < path.length; i++) {
+        context.lineTo(path[i].x, path[i].y);
+        // context.quadraticCurveTo(20,100,10,20);
+      }
+      context.stroke();
+    }
+  }, {
+    key: '_throttledDraw',
+    value: function _throttledDraw() {
+      for (var key in this._paths) {
+        var path = this._paths[key];
+        this.draw(path);
+      }
     }
   }, {
     key: 'render',
@@ -138,103 +230,23 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
 
       var _props = _objectWithoutProperties(_props2, ['width', 'height', 'scale', 'offset']);
 
-      var logs = this.state.logs;
-
-      return _react2.default.createElement(
-        _layoutComponents.Flex,
-        { row: true,
-          style: { width: width, height: height } },
-        _react2.default.createElement(_layoutComponents.FlexItem, _extends({ fluid: true, component: _Canvas2.default, style: { border: '2px solid pink' },
-          onMouseDown: this.genericHandler,
-          onMouseMove: this.genericHandler,
-          onMouseUp: this.genericHandler,
-          onTouchStart: this.genericHandler,
-          onTouchMove: this.genericHandler,
-          onTouchEnd: this.genericHandler,
-          onTouchCancel: this.genericHandler
-        }, _props)),
-        _react2.default.createElement(
-          _layoutComponents.FlexItem,
-          { fixed: true, width: '400px' },
-          _react2.default.createElement(
-            'button',
-            { onClick: this.clearLogs },
-            'clear logs'
-          ),
-          _react2.default.createElement(
-            'table',
-            null,
-            _react2.default.createElement(
-              'thead',
-              null,
-              _react2.default.createElement(
-                'tr',
-                null,
-                _react2.default.createElement(
-                  'th',
-                  null,
-                  'Event Type'
-                ),
-                _react2.default.createElement(
-                  'th',
-                  null,
-                  'X'
-                ),
-                _react2.default.createElement(
-                  'th',
-                  null,
-                  'Y'
-                ),
-                _react2.default.createElement(
-                  'th',
-                  null,
-                  'force'
-                )
-              )
-            ),
-            _react2.default.createElement(
-              'tbody',
-              { style: {} },
-              logs.map(function (log, $ind) {
-                return _react2.default.createElement(
-                  'tr',
-                  { key: $ind },
-                  _react2.default.createElement(
-                    'td',
-                    null,
-                    log.type
-                  ),
-                  _react2.default.createElement(
-                    'td',
-                    null,
-                    log.position ? log.position.x : ''
-                  ),
-                  _react2.default.createElement(
-                    'td',
-                    null,
-                    log.position ? log.position.y : ''
-                  ),
-                  _react2.default.createElement(
-                    'td',
-                    null,
-                    log.touches ? log.force : 'x'
-                  )
-                );
-              })
-            )
-          )
-        )
-      );
+      return _react2.default.createElement(_Canvas2.default, _extends({ ref: 'active',
+        style: { border: '2px solid pink' },
+        width: width,
+        height: height,
+        onMouseDown: this.genericHandler,
+        onMouseMove: this.genericHandler,
+        onMouseUp: this.genericHandler,
+        onTouchStart: this.genericHandler,
+        onTouchMove: this.genericHandler,
+        onTouchEnd: this.genericHandler,
+        onTouchCancel: this.genericHandler
+      }, _props));
     }
   }]);
 
   return HappySandwichMaker;
 }(_react.Component), _class2.propTypes = {}, _class2.defaultProps = {}, _temp), (_applyDecoratedDescriptor(_class.prototype, 'genericHandler', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'genericHandler'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'clearLogs', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'clearLogs'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, 'log', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'log'), _class.prototype)), _class);
-
-// onGuestureStart={this.genericHandler}
-// onGuestureChange={this.genericHandler}
-// onGuestureEnd={this.genericHandler}
-
 exports.default = HappySandwichMaker;
 ;
 

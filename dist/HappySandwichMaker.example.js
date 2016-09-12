@@ -43,7 +43,7 @@ var HappySandwichMakerExample = function (_Component) {
     key: "render",
     value: function render() {
       return _react2.default.createElement(_HappySandwichMaker2.default, { width: 1000,
-        height: 800,
+        height: 400,
         style: style
       });
     }
