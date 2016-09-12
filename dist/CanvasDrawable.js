@@ -253,6 +253,9 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
 
       pen(this.inactive.context, newPath.data);
       if (save) this.inactive.saveImage();
+      var onImageUpdate = this.props.onImageUpdate;
+
+      if (onImageUpdate) onImageUpdate(this.inactive.image);
     }
   }, {
     key: 'updatePaintStack',
@@ -323,7 +326,8 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
 }(_react.Component), _class2.propTypes = {
   width: number,
   height: number,
-  renderRatio: number
+  renderRatio: number,
+  onImageUpdate: func
 }, _class2.defaultProps = {
   renderRatio: 3
 }, _temp), (_applyDecoratedDescriptor(_class.prototype, 'genericHandler', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'genericHandler'), _class.prototype)), _class);

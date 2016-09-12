@@ -73,7 +73,7 @@ var Canvas = (_temp = _class = function (_Component) {
   }, {
     key: 'putImage',
     value: function putImage() {
-      return this.context.putImageData(this.paintStackImage, 0, 0);
+      return this.context.putImageData(this.image, 0, 0);
     }
   }, {
     key: 'render',
