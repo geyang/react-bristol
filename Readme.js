@@ -29,9 +29,9 @@ var _HappySandwichMaker3 = require("!!raw!../HappySandwichMaker.example");
 
 var _HappySandwichMaker4 = _interopRequireDefault(_HappySandwichMaker3);
 
-var _HappySandwichMaker5 = require("!!react-docgen!../HappySandwichMaker");
+var _CanvasDrawable = require("!!react-docgen!../CanvasDrawable");
 
-var _HappySandwichMaker6 = _interopRequireDefault(_HappySandwichMaker5);
+var _CanvasDrawable2 = _interopRequireDefault(_CanvasDrawable);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -53,7 +53,7 @@ function Readme(_ref) {
     _react2.default.createElement(
       "div",
       { className: "table-container horizontal-scroll flex-column center" },
-      _react2.default.createElement(_reactComponentPropsTable2.default, { propMetaData: _HappySandwichMaker6.default.props })
+      _react2.default.createElement(_reactComponentPropsTable2.default, { propMetaData: _CanvasDrawable2.default.props })
     ),
     "\n      ### Usage Example\n\n      The source code below of the example above is loaded using the webpack raw loader.",
     _react2.default.createElement(
