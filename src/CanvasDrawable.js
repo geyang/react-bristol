@@ -31,6 +31,7 @@ export default class HappySandwichMaker extends Component {
   componentDidMount() {
     this.canvas = this.refs['active'];
     this.activeContext = this.canvas.context;
+    this.updatePaintStack()
   }
 
   @autobind
@@ -80,7 +81,7 @@ export default class HappySandwichMaker extends Component {
     const {renderRatio} =  this.props;
     const pos = {
       x: (pageX - this.canvas.pageOffset.left
-         - (this.canvas.pageOffset.width - this.props.width) / 2
+        - (this.canvas.pageOffset.width - this.props.width) / 2
       ) * renderRatio,
       y: (pageY - this.canvas.pageOffset.top
         - (this.canvas.pageOffset.height - this.props.height) / 2
@@ -112,19 +113,49 @@ export default class HappySandwichMaker extends Component {
     // this need to go into a function
     this._paintStack.push(this._activePaths[id]);
     delete this._activePaths[id];
+    this.updatePaintStack()
   }
 
   draw() {
-    //1. draw existing
+    // 0. clear
+    this.putImage();
     //2. draw active
     this.drawActivePaths();
+  }
+
+  clear() {
+    const {width, height, renderRatio} = this.props;
+    this.activeContext.clearRect(0, 0, width * renderRatio, height * renderRatio);
+  }
+
+  getImageData() {
+    const {width, height, renderRatio} = this.props;
+    return this.activeContext.getImageData(0, 0, width * renderRatio, height * renderRatio);
+  }
+
+  saveImage() {
+    this.paintStackImage = this.getImageData();
+  }
+
+  putImage() {
+    return this.activeContext.putImageData(this.paintStackImage, 0, 0);
+  }
+
+  updatePaintStack() {
+    // this.putImage();
+    this.clear();
+    this._paintStack.forEach(
+      ({data}) => {
+        // todo: get pen info from path meta data next time.
+        pen(this.activeContext, data);
+      });
+    this.saveImage();
   }
 
   drawActivePaths() {
     for (let key in this._activePaths) {
       const pathData = this._activePaths[key].data;
-      const context = this.activeContext;
-      pen(context, pathData)
+      pen(this.activeContext, pathData)
     }
   }
 
