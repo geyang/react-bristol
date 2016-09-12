@@ -58,7 +58,16 @@ var Canvas = (_temp = _class = function (_Component) {
     key: 'pageOffset',
     get: function get() {
       if (this._pageOffset) return this._pageOffset;
-      this._pageOffset = this.nativeElement.getBoundingClientRect();
+      var canvasRect = this.nativeElement.getBoundingClientRect();
+      var pageRect = window.document.body.getBoundingClientRect();
+      this._pageOffset = {
+        left: canvasRect.left - pageRect.left,
+        right: canvasRect.right - pageRect.right,
+        top: canvasRect.top - pageRect.top,
+        bottom: canvasRect.bottom - pageRect.bottom,
+        width: canvasRect.width,
+        height: canvasRect.height
+      };
       return this._pageOffset;
     }
   }]);

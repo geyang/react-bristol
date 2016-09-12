@@ -10,6 +10,9 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _desc, _value, _class, _class2, _temp;
+// import SimplePen from './extensions/simplePen';
+// const simplePen = SimplePen({color: 'blue', strokeWidth: 1});
+
 
 var _react = require('react');
 
@@ -23,9 +26,9 @@ var _Canvas = require('./Canvas');
 
 var _Canvas2 = _interopRequireDefault(_Canvas);
 
-var _simplePen = require('./extensions/simplePen');
+var _calligraphyPen = require('./extensions/calligraphyPen');
 
-var _simplePen2 = _interopRequireDefault(_simplePen);
+var _calligraphyPen2 = _interopRequireDefault(_calligraphyPen);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -65,6 +68,8 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
 
   return desc;
 }
+
+var pen = (0, _calligraphyPen2.default)({ color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 0 });
 
 var number = _react.PropTypes.number;
 var func = _react.PropTypes.func;
@@ -123,19 +128,6 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       }
     }
   }, {
-    key: 'getDressedCursorPosition',
-    value: function getDressedCursorPosition(pageX, pageY) {
-      var refreshOffset = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-
-      if (refreshOffset) this.canvas.clearPageOffset();
-      var renderRatio = this.props.renderRatio;
-
-      return {
-        x: (pageX - this.canvas.pageOffset.left - (this.canvas.pageOffset.width - this.props.width) / 2) * renderRatio,
-        y: (pageY - this.canvas.pageOffset.top - (this.canvas.pageOffset.height - this.props.height) / 2) * renderRatio
-      };
-    }
-  }, {
     key: 'recordTouch',
     value: function recordTouch(_ref2) {
       var _this3 = this;
@@ -161,6 +153,8 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
           break;
         case 'mousemove':
         case 'touchmove':
+          if (!this.getActivePath(id)) return;
+
           var _getDressedCursorPosi2 = this.getDressedCursorPosition(pageX, pageY);
 
           x = _getDressedCursorPosi2.x;
@@ -184,6 +178,20 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       this.draw();
     }
   }, {
+    key: 'getDressedCursorPosition',
+    value: function getDressedCursorPosition(pageX, pageY) {
+      var refreshOffset = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
+      if (refreshOffset) this.canvas.clearPageOffset();
+      var renderRatio = this.props.renderRatio;
+
+      var pos = {
+        x: (pageX - this.canvas.pageOffset.left - (this.canvas.pageOffset.width - this.props.width) / 2) * renderRatio,
+        y: (pageY - this.canvas.pageOffset.top - (this.canvas.pageOffset.height - this.props.height) / 2) * renderRatio
+      };
+      return pos;
+    }
+  }, {
     key: 'startPath',
     value: function startPath(_ref3) {
       var id = _ref3.id;
@@ -192,7 +200,16 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var force = _ref3.force;
       var tilt = _ref3.tilt;
 
-      this._activePaths[id] = [{ x: x, y: y, force: force, tilt: tilt }];
+      this._activePaths[id] = {
+        pressureSensitive: !!force, // 0 => false, undefined => false, 0.20 => true
+        data: []
+      };
+      this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
+    }
+  }, {
+    key: 'getActivePath',
+    value: function getActivePath(id) {
+      return this._activePaths[id];
     }
   }, {
     key: 'appendPathPoint',
@@ -203,8 +220,10 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var force = _ref4.force;
       var tilt = _ref4.tilt;
 
-      if (!this._activePaths[id]) return;
-      this._activePaths[id].push({ x: x, y: y, force: force, tilt: tilt });
+      var path = this.getActivePath(id);
+      if (!path) return;
+      if (!path.pressureSensitive) force = 1;
+      path.data.push({ x: x, y: y, force: force, tilt: tilt });
     }
   }, {
     key: 'completePath',
@@ -221,20 +240,14 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       //1. draw existing
       //2. draw active
       this.drawActivePaths();
-      //3. rescale
-      // todo: use inactiveContext
-      var renderRatio = this.props.renderRatio;
-      // console.log(renderRatio);
-
-      this.activeContext.scale(1, 1);
     }
   }, {
     key: 'drawActivePaths',
     value: function drawActivePaths() {
       for (var key in this._activePaths) {
-        var path = this._activePaths[key];
+        var pathData = this._activePaths[key].data;
         var context = this.activeContext;
-        (0, _simplePen2.default)(context, path);
+        pen(context, pathData);
       }
     }
   }, {
@@ -252,9 +265,11 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
 
       return _react2.default.createElement(
         'div',
-        { style: _extends({ width: width, height: height }, style) },
+        { style: _extends({ width: width, height: height, position: 'relative' }, style) },
         _react2.default.createElement(_Canvas2.default, _extends({ ref: 'active',
           style: {
+            position: 'absolute',
+            top: 0, left: 0,
             transform: 'scale(' + 1 / renderRatio + ', ' + 1 / renderRatio + ')' + ('translate(' + -width * renderRatio + 'px, ' + -height * renderRatio + 'px)')
           },
           width: width * renderRatio,
@@ -286,6 +301,8 @@ exports.default = HappySandwichMaker;
   if (typeof __REACT_HOT_LOADER__ === 'undefined') {
     return;
   }
+
+  __REACT_HOT_LOADER__.register(pen, 'pen', 'src/CanvasDrawable.js');
 
   __REACT_HOT_LOADER__.register(number, 'number', 'src/CanvasDrawable.js');
 
