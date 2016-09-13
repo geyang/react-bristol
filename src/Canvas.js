@@ -1,10 +1,15 @@
 /** Created by ge on 9/11/16. */
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import {findDOMNode} from 'react-dom';
 
+const {bool} = PropTypes;
 export default class Canvas extends Component {
-  static propTypes = {};
-  static defaultProps = {};
+  static propTypes = {
+    interpolation: bool
+  };
+  static defaultProps = {
+    interpolation: true
+  };
 
   componentDidMount() {
     this.nativeElement = findDOMNode(this);
@@ -50,7 +55,16 @@ export default class Canvas extends Component {
   }
 
   render() {
-    const {..._props} = this.props;
-    return <canvas {..._props}/>
+    const {interpolation, style, ..._props} = this.props;
+    const _style = interpolation ? style : {
+      imageRendering: 'optimizeSpeed',
+      // imageRendering: '-moz-crisp-edges',
+      // imageRendering: '-webkit-optimize-contrast',
+      // imageRendering: '-o-crisp-edges',
+      // imageRendering: 'pixelated',
+      msInterpolationMode: 'nearest-neighbor',
+      ...style
+    };
+    return <canvas style={_style} {..._props}/>
   }
 }

@@ -60,11 +60,11 @@ exports.default = HappySandwichMaker;
     return;
   }
 
-  __REACT_HOT_LOADER__.register(number, "number", "src/HappySandwichMaker.spec.js");
+  __REACT_HOT_LOADER__.register(number, "number", "src/Bristol.spec.js");
 
-  __REACT_HOT_LOADER__.register(string, "string", "src/HappySandwichMaker.spec.js");
+  __REACT_HOT_LOADER__.register(string, "string", "src/Bristol.spec.js");
 
-  __REACT_HOT_LOADER__.register(HappySandwichMaker, "HappySandwichMaker", "src/HappySandwichMaker.spec.js");
+  __REACT_HOT_LOADER__.register(HappySandwichMaker, "HappySandwichMaker", "src/Bristol.spec.js");
 })();
 
 ;

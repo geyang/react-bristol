@@ -7,8 +7,8 @@ import Markdown from "react-markdownit";
 import Highlight from "@episodeyang/react-highlight.js";
 import PropsTable from "react-component-props-table";
 
-import HappySandwichMakerExample from "../HappySandwichMaker.example";
-import HappySandwichMakerSource from "!!raw!../HappySandwichMaker.example";
+import HappySandwichMakerExample from "../Bristol.example";
+import HappySandwichMakerSource from "!!raw!../Bristol.example.js";
 import HappySandwichMakerAST from "!!react-docgen!../Bristol";
 
 export default function Readme({}) {

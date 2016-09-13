@@ -17,11 +17,13 @@ export default class HappySandwichMaker extends Component {
     width: number,
     height: number,
     renderRatio: number,
-    onImageUpdate: func
+    onImageUpdate: func,
+    interpolation: bool
   };
 
   static defaultProps = {
-    renderRatio: 3
+    renderRatio: 3,
+    interpolation: true
   };
 
   componentWillMount() {
@@ -60,21 +62,26 @@ export default class HappySandwichMaker extends Component {
       case 'touchstart':
         ({x, y} = this.getDressedCursorPosition(pageX, pageY, true));
         this.startPath({id, x, y, force, tilt});
+        this.drawActivePaths();
         break;
       case 'mousemove':
       case 'touchmove':
         if (!this.getActivePath(id)) return;
         ({x, y} = this.getDressedCursorPosition(pageX, pageY));
         this.appendPathPoint({id, x, y, force, tilt});
+        this.drawActivePaths();
         break;
       case 'mouseup':
       case 'touchend':
         ({x, y} = this.getDressedCursorPosition(pageX, pageY));
         this.appendPathPoint({id, x, y, force, tilt});
-        setTimeout(() => this.completePath({id}), 16);
+        const path = this.completePath({id});
+        setTimeout(() => {
+          this.drawActivePaths(true);
+          this.patchPaintStack(path);
+        }, 16);
         break;
     }
-    this.draw();
   }
 
   getDressedCursorPosition(pageX, pageY, refreshOffset = false) {
@@ -111,19 +118,10 @@ export default class HappySandwichMaker extends Component {
   }
 
   completePath({id}) {
-    // this need to go into a function
     let path = this._activePaths[id];
     this._paintStack.push(path);
     delete this._activePaths[id];
-    this.patchPaintStack(path);
-    // this.updatePaintStack()
-  }
-
-  draw() {
-    // 0. clear
-    this.active.clear();
-    //2. draw active
-    this.drawActivePaths();
+    return path;
   }
 
   patchPaintStack(newPath, save = true) {
@@ -144,7 +142,8 @@ export default class HappySandwichMaker extends Component {
     this.inactive.saveImage();
   }
 
-  drawActivePaths() {
+  drawActivePaths(clearFirst = true) {
+    if (clearFirst) this.active.clear();
     for (let key in this._activePaths) {
       const pathData = this._activePaths[key].data;
       pen(this.active.context, pathData)
@@ -152,18 +151,20 @@ export default class HappySandwichMaker extends Component {
   }
 
   render() {
-    const {width, height, renderRatio, scale, offset, style, ..._props} = this.props;
+    const {width, height, renderRatio, onImageUpdate, interpolation, scale, offset, style, ..._props} = this.props;
     const canvasStyle = {
       position: 'absolute',
       top: 0, left: 0,
       transform: `scale(${1 / renderRatio}, ${1 / renderRatio})` +
-      `translate(${-width * renderRatio}px, ${-height * renderRatio}px)`
+      `translate(${-width * (renderRatio - 1) * renderRatio / 2}px, ${-height * (renderRatio - 1) * renderRatio / 2}px)`
     };
+    console.log(-width, renderRatio, -width * renderRatio);
     return (
       <div style={{width, height, position: 'relative', ...style}}>
         <Canvas ref="active"
                 style={canvasStyle}
                 width={width * renderRatio}
+          // always interpolate for otherwise won't show on mobile safari.
                 height={height * renderRatio}
                 onMouseDown={this.genericHandler}
                 onMouseMove={this.genericHandler}
@@ -177,7 +178,8 @@ export default class HappySandwichMaker extends Component {
                 style={{...canvasStyle, zIndex: -1}}
                 width={width * renderRatio}
                 height={height * renderRatio}
-        />
+                interpolation={interpolation}
+                {..._props}/>
       </div>
     );
   }

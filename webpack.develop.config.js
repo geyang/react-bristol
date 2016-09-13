@@ -10,10 +10,12 @@ var hljs = require('highlight.js');
 require('es6-promise').polyfill();
 
 const port = 5000;
+// const clientHost = `http://localhost:${port}`;
+const clientHost = `http://e0dca1e4.ngrok.io`;
 
 const build_entry = {
   app: [
-    `webpack-dev-server/client?http://localhost:${port}`,
+    `webpack-dev-server/client?${clientHost}`,
     'webpack/hot/only-dev-server',
     'react-hot-loader/patch',
     'babel-polyfill',
@@ -134,6 +136,7 @@ module.exports = {
   },
   devServer: {
     port: port,
+    host: '0.0.0.0',
     stats: {colors: true},
     contentBase: "./src/example",
     noInfo: true, //  --no-info option

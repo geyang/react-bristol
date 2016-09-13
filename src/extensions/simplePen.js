@@ -1,12 +1,12 @@
 /** Created by ge on 9/12/16. */
 import Color from 'color';
-export default function SimplePen({color, strokeWidth}) {
+export default function SimplePen({color, strokeWidth = 1, blur = 0}) {
 
   return function simplePen(context, pathData) {
     if (!pathData) return;
     context.beginPath();
     context.lineWidth = strokeWidth;
-    context.shadowBlur = strokeWidth * 1.5;
+    context.shadowBlur = blur;
     context.shadowColor = color;
     context.moveTo(pathData[0].x, pathData[0].y);
     for (var i = 1; i < pathData.length; i++) {

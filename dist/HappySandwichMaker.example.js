@@ -97,9 +97,9 @@ exports.default = HappySandwichMakerExample;
     return;
   }
 
-  __REACT_HOT_LOADER__.register(style, "style", "src/HappySandwichMaker.example.js");
+  __REACT_HOT_LOADER__.register(style, "style", "src/Bristol.example.js");
 
-  __REACT_HOT_LOADER__.register(HappySandwichMakerExample, "HappySandwichMakerExample", "src/HappySandwichMaker.example.js");
+  __REACT_HOT_LOADER__.register(HappySandwichMakerExample, "HappySandwichMakerExample", "src/Bristol.example.js");
 })();
 
 ;

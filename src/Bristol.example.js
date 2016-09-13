@@ -17,6 +17,8 @@ export default class HappySandwichMakerExample extends Component {
       <Bristol width={1000}
                height={400}
                style={style}
+               renderRatio={2}
+               interpolation={false}
                onImageUpdate={this.saveImage}
       />
     );
