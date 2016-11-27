@@ -13,24 +13,64 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function SimplePen(_ref) {
   var color = _ref.color;
-  var strokeWidth = _ref.strokeWidth;
+  var _ref$strokeWidth = _ref.strokeWidth;
+  var strokeWidth = _ref$strokeWidth === undefined ? 1 : _ref$strokeWidth;
 
+
+  var floor = 0.5;
+
+  function getWidth(force) {
+    return strokeWidth * Math.max(Math.min(1.5, force / 0.065), floor);
+  }
+
+  function getColor(force) {
+    return (0, _color2.default)(color).alpha(Math.max(force / 0.0125, 0.5)).hslaString();
+  }
 
   return function simplePen(context, pathData) {
+    var options = arguments.length <= 2 || arguments[2] === undefined ? { active: false } : arguments[2];
+
     if (!pathData) return;
     context.beginPath();
-    context.lineWidth = strokeWidth;
-    context.shadowBlur = strokeWidth * 1.5;
-    context.shadowColor = color;
+    if (pathData.length == 0) return;
+
+    if (options.active) {
+      pathData = pathData.slice(-2);
+      context.lineCap = 'butt';
+    } else {
+      context.lineCap = 'butt';
+      // context.lineCap = 'round';
+      if (pathData.length == 1) {
+        var point = pathData[0];
+        var halfWidth = getWidth(point.force) / 4;
+        pathData = [{
+          x: point.x - halfWidth,
+          y: point.y - halfWidth,
+          tilt: point.tilt,
+          force: point.force
+        }, {
+          x: point.x + halfWidth,
+          y: point.y + halfWidth,
+          tilt: point.tilt,
+          force: point.force
+        }];
+      }
+    }
+
     context.moveTo(pathData[0].x, pathData[0].y);
     for (var i = 1; i < pathData.length; i++) {
-      var force = pathData.slice(-1)[0].force;
+      var _point = pathData[i];
+      var force = _point.force;
       if (typeof force === 'undefined') force = 1;
-      context.lineTo(pathData[i].x, pathData[i].y);
-      context.strokeStyle = '' + (0, _color2.default)(color).clearer(force / 0.5);
-      // context.quadraticCurveTo(20,100,10,20);
+      context.lineWidth = getWidth(force);
+      context.strokeStyle = '' + getColor(force);
+      context.lineTo(_point.x, _point.y);
+      context.stroke();
+      if (!options.active) {
+        context.beginPath();
+        context.moveTo(_point.x, _point.y);
+      }
     }
-    context.stroke();
   };
 } /** Created by ge on 9/12/16. */
 ;

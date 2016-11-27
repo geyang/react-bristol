@@ -12,10 +12,15 @@ function StencilPen(_ref) {
   var strokeWidth = _ref.strokeWidth;
 
 
-  return function stencilPen(context, pathData) {
+  return function stencilPen(context, pathData, _ref2) {
+    var _ref2$active = _ref2.active;
+    var active = _ref2$active === undefined ? false : _ref2$active;
+
     if (!pathData) return;
     context.beginPath();
     context.lineWidth = strokeWidth;
+    if (pathData.length < 2) return;else if (active) pathData = pathData.slice(-2);
+
     context.moveTo(pathData[0].x, pathData[0].y);
     for (var i = 1; i < pathData.length; i++) {
       var force = pathData.slice(-1)[0].force;

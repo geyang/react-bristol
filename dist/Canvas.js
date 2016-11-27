@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = undefined;
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _class, _temp; /** Created by ge on 9/11/16. */
@@ -26,6 +28,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var bool = _react.PropTypes.bool;
 var Canvas = (_temp = _class = function (_Component) {
   _inherits(Canvas, _Component);
 
@@ -78,9 +81,21 @@ var Canvas = (_temp = _class = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _props = _objectWithoutProperties(this.props, []);
+      var _props4 = this.props;
+      var interpolation = _props4.interpolation;
+      var style = _props4.style;
 
-      return _react2.default.createElement('canvas', _props);
+      var _props = _objectWithoutProperties(_props4, ['interpolation', 'style']);
+
+      var _style = interpolation ? style : _extends({
+        imageRendering: 'optimizeSpeed',
+        // imageRendering: '-moz-crisp-edges',
+        // imageRendering: '-webkit-optimize-contrast',
+        // imageRendering: '-o-crisp-edges',
+        // imageRendering: 'pixelated',
+        msInterpolationMode: 'nearest-neighbor'
+      }, style);
+      return _react2.default.createElement('canvas', _extends({ style: _style }, _props));
     }
   }, {
     key: 'pageOffset',
@@ -101,7 +116,11 @@ var Canvas = (_temp = _class = function (_Component) {
   }]);
 
   return Canvas;
-}(_react.Component), _class.propTypes = {}, _class.defaultProps = {}, _temp);
+}(_react.Component), _class.propTypes = {
+  interpolation: bool
+}, _class.defaultProps = {
+  interpolation: true
+}, _temp);
 exports.default = Canvas;
 ;
 
@@ -109,6 +128,8 @@ exports.default = Canvas;
   if (typeof __REACT_HOT_LOADER__ === 'undefined') {
     return;
   }
+
+  __REACT_HOT_LOADER__.register(bool, 'bool', 'src/Canvas.js');
 
   __REACT_HOT_LOADER__.register(Canvas, 'Canvas', 'src/Canvas.js');
 })();

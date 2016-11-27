@@ -7,9 +7,14 @@ exports.default = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _desc, _value, _class, _class2, _temp;
+// import DotTest from './extensions/dotTest';
+// const pen = DotTest({color: '#003bff'});
+
 
 var _react = require('react');
 
@@ -66,7 +71,7 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
   return desc;
 }
 
-var pen = (0, _simplePen2.default)({ color: 'blue', strokeWidth: 1 });
+var pen = (0, _simplePen2.default)({ color: '#003BFF', strokeWidth: 2 });
 // import CalligraphyPen from './extensions/calligraphyPen';
 // const pen = CalligraphyPen({color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 1});
 
@@ -142,41 +147,50 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
 
       var x = void 0,
           y = void 0;
-      switch (eventType) {
-        case 'mousedown':
-        case 'touchstart':
-          var _getDressedCursorPosi = this.getDressedCursorPosition(pageX, pageY, true);
 
-          x = _getDressedCursorPosi.x;
-          y = _getDressedCursorPosi.y;
+      var _ret = function () {
+        switch (eventType) {
+          case 'mousedown':
+          case 'touchstart':
+            var _getDressedCursorPosi = _this3.getDressedCursorPosition(pageX, pageY, true);
 
-          this.startPath({ id: id, x: x, y: y, force: force, tilt: tilt });
-          break;
-        case 'mousemove':
-        case 'touchmove':
-          if (!this.getActivePath(id)) return;
+            x = _getDressedCursorPosi.x;
+            y = _getDressedCursorPosi.y;
 
-          var _getDressedCursorPosi2 = this.getDressedCursorPosition(pageX, pageY);
+            _this3.startPath({ id: id, x: x, y: y, force: force, tilt: tilt });
+            _this3.drawActivePaths();
+            break;
+          case 'mousemove':
+          case 'touchmove':
+            if (!_this3.getActivePath(id)) return {
+                v: void 0
+              };
 
-          x = _getDressedCursorPosi2.x;
-          y = _getDressedCursorPosi2.y;
+            var _getDressedCursorPosi2 = _this3.getDressedCursorPosition(pageX, pageY);
 
-          this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
-          break;
-        case 'mouseup':
-        case 'touchend':
-          var _getDressedCursorPosi3 = this.getDressedCursorPosition(pageX, pageY);
+            x = _getDressedCursorPosi2.x;
+            y = _getDressedCursorPosi2.y;
 
-          x = _getDressedCursorPosi3.x;
-          y = _getDressedCursorPosi3.y;
+            _this3.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
+            _this3.drawActivePaths();
+            break;
+          case 'mouseup':
+          case 'touchend':
+            var _getDressedCursorPosi3 = _this3.getDressedCursorPosition(pageX, pageY);
 
-          this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
-          setTimeout(function () {
-            return _this3.completePath({ id: id });
-          }, 16);
-          break;
-      }
-      this.draw();
+            x = _getDressedCursorPosi3.x;
+            y = _getDressedCursorPosi3.y;
+
+            var path = _this3.completePath({ id: id });
+            setTimeout(function () {
+              _this3.drawActivePaths(true);
+              _this3.patchPaintStack(path);
+            }, 16);
+            break;
+        }
+      }();
+
+      if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
     }
   }, {
     key: 'getDressedCursorPosition',
@@ -231,20 +245,10 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
     value: function completePath(_ref5) {
       var id = _ref5.id;
 
-      // this need to go into a function
       var path = this._activePaths[id];
       this._paintStack.push(path);
       delete this._activePaths[id];
-      this.patchPaintStack(path);
-      // this.updatePaintStack()
-    }
-  }, {
-    key: 'draw',
-    value: function draw() {
-      // 0. clear
-      this.active.clear();
-      //2. draw active
-      this.drawActivePaths();
+      return path;
     }
   }, {
     key: 'patchPaintStack',
@@ -275,9 +279,12 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
   }, {
     key: 'drawActivePaths',
     value: function drawActivePaths() {
+      var clearFirst = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+
+      if (clearFirst) this.active.clear();
       for (var key in this._activePaths) {
         var pathData = this._activePaths[key].data;
-        pen(this.active.context, pathData);
+        pen(this.active.context, pathData, { active: true });
       }
     }
   }, {
@@ -287,24 +294,28 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var width = _props2.width;
       var height = _props2.height;
       var renderRatio = _props2.renderRatio;
+      var onImageUpdate = _props2.onImageUpdate;
+      var interpolation = _props2.interpolation;
       var scale = _props2.scale;
       var offset = _props2.offset;
       var style = _props2.style;
 
-      var _props = _objectWithoutProperties(_props2, ['width', 'height', 'renderRatio', 'scale', 'offset', 'style']);
+      var _props = _objectWithoutProperties(_props2, ['width', 'height', 'renderRatio', 'onImageUpdate', 'interpolation', 'scale', 'offset', 'style']);
 
       var canvasStyle = {
         position: 'absolute',
         top: 0, left: 0,
-        transform: 'scale(' + 1 / renderRatio + ', ' + 1 / renderRatio + ')' + ('translate(' + -width * renderRatio + 'px, ' + -height * renderRatio + 'px)')
+        transform: 'scale(' + 1 / renderRatio + ', ' + 1 / renderRatio + ')' + ('translate(' + -width * (renderRatio - 1) * renderRatio / 2 + 'px, ' + -height * (renderRatio - 1) * renderRatio / 2 + 'px)')
       };
+      console.log(-width, renderRatio, -width * renderRatio);
       return _react2.default.createElement(
         'div',
         { style: _extends({ width: width, height: height, position: 'relative' }, style) },
         _react2.default.createElement(_Canvas2.default, _extends({ ref: 'active',
           style: canvasStyle,
-          width: width * renderRatio,
-          height: height * renderRatio,
+          width: width * renderRatio
+          // always interpolate for otherwise won't show on mobile safari.
+          , height: height * renderRatio,
           onMouseDown: this.genericHandler,
           onMouseMove: this.genericHandler,
           onMouseUp: this.genericHandler,
@@ -313,11 +324,12 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
           onTouchEnd: this.genericHandler,
           onTouchCancel: this.genericHandler
         }, _props)),
-        _react2.default.createElement(_Canvas2.default, { ref: 'inactive',
+        _react2.default.createElement(_Canvas2.default, _extends({ ref: 'inactive',
           style: _extends({}, canvasStyle, { zIndex: -1 }),
           width: width * renderRatio,
-          height: height * renderRatio
-        })
+          height: height * renderRatio,
+          interpolation: interpolation
+        }, _props))
       );
     }
   }]);
@@ -327,9 +339,11 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
   width: number,
   height: number,
   renderRatio: number,
-  onImageUpdate: func
+  onImageUpdate: func,
+  interpolation: bool
 }, _class2.defaultProps = {
-  renderRatio: 3
+  renderRatio: 3,
+  interpolation: true
 }, _temp), (_applyDecoratedDescriptor(_class.prototype, 'genericHandler', [_autobindDecorator2.default], Object.getOwnPropertyDescriptor(_class.prototype, 'genericHandler'), _class.prototype)), _class);
 exports.default = HappySandwichMaker;
 ;
