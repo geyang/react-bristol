@@ -1,10 +1,15 @@
 /** Created by ge on 9/12/16. */
 export default function StencilPen({color, alpha = 1, strokeWidth}) {
 
-  return function stencilPen(context, pathData) {
+  return function stencilPen(context, pathData, {active = false}) {
     if (!pathData) return;
     context.beginPath();
     context.lineWidth = strokeWidth;
+    if (pathData.length < 2)
+      return;
+    else if (active)
+      pathData = pathData.slice(-2);
+
     context.moveTo(pathData[0].x, pathData[0].y);
     for (var i = 1; i < pathData.length; i++) {
       let force = pathData.slice(-1)[0].force;

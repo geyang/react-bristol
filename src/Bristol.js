@@ -1,8 +1,10 @@
 import React, {Component, PropTypes} from 'react';
 import autobind from 'autobind-decorator';
 import Canvas from './Canvas';
+// import DotTest from './extensions/dotTest';
+// const pen = DotTest({color: '#003bff'});
 import SimplePen from './extensions/simplePen';
-const pen = SimplePen({color: 'blue', strokeWidth: 1});
+const pen = SimplePen({color: '#003BFF', strokeWidth: 2});
 // import CalligraphyPen from './extensions/calligraphyPen';
 // const pen = CalligraphyPen({color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 1});
 
@@ -74,7 +76,6 @@ export default class HappySandwichMaker extends Component {
       case 'mouseup':
       case 'touchend':
         ({x, y} = this.getDressedCursorPosition(pageX, pageY));
-        this.appendPathPoint({id, x, y, force, tilt});
         const path = this.completePath({id});
         setTimeout(() => {
           this.drawActivePaths(true);
@@ -142,11 +143,11 @@ export default class HappySandwichMaker extends Component {
     this.inactive.saveImage();
   }
 
-  drawActivePaths(clearFirst = true) {
+  drawActivePaths(clearFirst = false) {
     if (clearFirst) this.active.clear();
     for (let key in this._activePaths) {
       const pathData = this._activePaths[key].data;
-      pen(this.active.context, pathData)
+      pen(this.active.context, pathData, {active: true})
     }
   }
 
