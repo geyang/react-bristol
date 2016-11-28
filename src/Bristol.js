@@ -9,7 +9,7 @@ const pen = SimplePen({color: '#003BFF', strokeWidth: 2});
 // const pen = CalligraphyPen({color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 1});
 
 
-var {number, func, bool, string, oneOf} = PropTypes;
+var {number, func, bool, string, oneOf, any} = PropTypes;
 /**
  * description of the component
  */
@@ -20,6 +20,9 @@ export default class HappySandwichMaker extends Component {
     height: number,
     renderRatio: number,
     onImageUpdate: func,
+    onChange: func,
+    /** todo: use correct type for the background image */
+    backgroundImage: any,
     interpolation: bool
   };
 
@@ -152,14 +155,13 @@ export default class HappySandwichMaker extends Component {
   }
 
   render() {
-    const {width, height, renderRatio, onImageUpdate, interpolation, scale, offset, style, ..._props} = this.props;
+    const {width, height, renderRatio, onChange, onImageUpdate, backgroundImage, interpolation, scale, offset, style, ..._props} = this.props;
     const canvasStyle = {
       position: 'absolute',
       top: 0, left: 0,
       transform: `scale(${1 / renderRatio}, ${1 / renderRatio})` +
       `translate(${-width * (renderRatio - 1) * renderRatio / 2}px, ${-height * (renderRatio - 1) * renderRatio / 2}px)`
     };
-    console.log(-width, renderRatio, -width * renderRatio);
     return (
       <div style={{width, height, position: 'relative', ...style}}>
         <Canvas ref="active"
@@ -174,6 +176,7 @@ export default class HappySandwichMaker extends Component {
                 onTouchMove={this.genericHandler}
                 onTouchEnd={this.genericHandler}
                 onTouchCancel={this.genericHandler}
+                interpolation={false}
                 {..._props}/>
         <Canvas ref="inactive"
                 style={{...canvasStyle, zIndex: -1}}
@@ -181,6 +184,11 @@ export default class HappySandwichMaker extends Component {
                 height={height * renderRatio}
                 interpolation={interpolation}
                 {..._props}/>
+        {backgroundImage ? <Canvas ref="background-image"
+                 style={{...canvasStyle, zIndex: -2}}
+                 width={width * renderRatio}
+                 height={height * renderRatio}
+                 interpolation={interpolation}/> : null}
       </div>
     );
   }

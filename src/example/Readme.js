@@ -23,7 +23,11 @@ export default function Readme({}) {
       This is a quick proof-of-concept component I built to test out the performance of mobile safari's
       input events, to see if I can build a Apple Pencil note taking app that lives inside the browser.
       At the moment, the touch events mobile safari emits have integer coordinates, making the inputs
-      a bit jagged The input event frequency is also on the lower side.
+      a bit jagged. The input event frequency is also on the lower side, but as of now
+      I have improved the rendering speed, making the hand writing much more responsive
+      and natural!
+
+      **Status:** User experience is good enough for me to use personally!
 
       There is currently a ticket in webkit that changes the input coordinates to \`double\`. Not sure
       when it will land though.
