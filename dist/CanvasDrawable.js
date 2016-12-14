@@ -145,41 +145,41 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       switch (eventType) {
         case 'mousedown':
         case 'touchstart':
-          var _getDressedCursorPosi = this.getDressedCursorPosition(pageX, pageY, true);
+          var _getDressedCursorPosi = this._getDressedCursorPosition(pageX, pageY, true);
 
           x = _getDressedCursorPosi.x;
           y = _getDressedCursorPosi.y;
 
-          this.startPath({ id: id, x: x, y: y, force: force, tilt: tilt });
+          this._startPath({ id: id, x: x, y: y, force: force, tilt: tilt });
           break;
         case 'mousemove':
         case 'touchmove':
-          if (!this.getActivePath(id)) return;
+          if (!this._getActivePath(id)) return;
 
-          var _getDressedCursorPosi2 = this.getDressedCursorPosition(pageX, pageY);
+          var _getDressedCursorPosi2 = this._getDressedCursorPosition(pageX, pageY);
 
           x = _getDressedCursorPosi2.x;
           y = _getDressedCursorPosi2.y;
 
-          this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
+          this._appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
           break;
         case 'mouseup':
         case 'touchend':
-          var _getDressedCursorPosi3 = this.getDressedCursorPosition(pageX, pageY);
+          var _getDressedCursorPosi3 = this._getDressedCursorPosition(pageX, pageY);
 
           x = _getDressedCursorPosi3.x;
           y = _getDressedCursorPosi3.y;
 
-          this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
+          this._appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
           setTimeout(function () {
-            return _this3.completePath({ id: id });
+            return _this3._completePath({ id: id });
           }, 16);
           break;
       }
       this.draw();
     }
   }, {
-    key: 'getDressedCursorPosition',
+    key: '_getDressedCursorPosition',
     value: function getDressedCursorPosition(pageX, pageY) {
       var refreshOffset = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
@@ -193,7 +193,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       return pos;
     }
   }, {
-    key: 'startPath',
+    key: '_startPath',
     value: function startPath(_ref3) {
       var id = _ref3.id;
       var x = _ref3.x;
@@ -205,15 +205,15 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
         pressureSensitive: !!force, // 0 => false, undefined => false, 0.20 => true
         data: []
       };
-      this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
+      this._appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
     }
   }, {
-    key: 'getActivePath',
+    key: '_getActivePath',
     value: function getActivePath(id) {
       return this._activePaths[id];
     }
   }, {
-    key: 'appendPathPoint',
+    key: '_appendPathPoint',
     value: function appendPathPoint(_ref4) {
       var id = _ref4.id;
       var x = _ref4.x;
@@ -221,13 +221,13 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var force = _ref4.force;
       var tilt = _ref4.tilt;
 
-      var path = this.getActivePath(id);
+      var path = this._getActivePath(id);
       if (!path) return;
       if (!path.pressureSensitive) force = 1;
       path.data.push({ x: x, y: y, force: force, tilt: tilt });
     }
   }, {
-    key: 'completePath',
+    key: '_completePath',
     value: function completePath(_ref5) {
       var id = _ref5.id;
 
@@ -235,8 +235,8 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var path = this._activePaths[id];
       this._paintStack.push(path);
       delete this._activePaths[id];
-      this.patchPaintStack(path);
-      // this.updatePaintStack()
+      this._patchPaintStack(path);
+      // this._updatePaintStack()
     }
   }, {
     key: 'draw',
@@ -247,7 +247,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       this.drawActivePaths();
     }
   }, {
-    key: 'patchPaintStack',
+    key: '_patchPaintStack',
     value: function patchPaintStack(newPath) {
       var save = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 

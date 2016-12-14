@@ -46,12 +46,8 @@ export default class Canvas extends Component {
     return this.context.getImageData(0, 0, width, height);
   }
 
-  saveImage() {
-    this.image = this.getImageData();
-  }
-
-  putImage() {
-    return this.context.putImageData(this.image, 0, 0);
+  toDataURL(type, options){
+    return this.nativeElement.toDataURL(type, options);
   }
 
   render() {

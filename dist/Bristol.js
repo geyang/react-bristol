@@ -152,39 +152,39 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
         switch (eventType) {
           case 'mousedown':
           case 'touchstart':
-            var _getDressedCursorPosi = _this3.getDressedCursorPosition(pageX, pageY, true);
+            var _getDressedCursorPosi = _this3._getDressedCursorPosition(pageX, pageY, true);
 
             x = _getDressedCursorPosi.x;
             y = _getDressedCursorPosi.y;
 
-            _this3.startPath({ id: id, x: x, y: y, force: force, tilt: tilt });
+            _this3._startPath({ id: id, x: x, y: y, force: force, tilt: tilt });
             _this3.drawActivePaths();
             break;
           case 'mousemove':
           case 'touchmove':
-            if (!_this3.getActivePath(id)) return {
+            if (!_this3._getActivePath(id)) return {
                 v: void 0
               };
 
-            var _getDressedCursorPosi2 = _this3.getDressedCursorPosition(pageX, pageY);
+            var _getDressedCursorPosi2 = _this3._getDressedCursorPosition(pageX, pageY);
 
             x = _getDressedCursorPosi2.x;
             y = _getDressedCursorPosi2.y;
 
-            _this3.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
+            _this3._appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
             _this3.drawActivePaths();
             break;
           case 'mouseup':
           case 'touchend':
-            var _getDressedCursorPosi3 = _this3.getDressedCursorPosition(pageX, pageY);
+            var _getDressedCursorPosi3 = _this3._getDressedCursorPosition(pageX, pageY);
 
             x = _getDressedCursorPosi3.x;
             y = _getDressedCursorPosi3.y;
 
-            var path = _this3.completePath({ id: id });
+            var path = _this3._completePath({ id: id });
             setTimeout(function () {
               _this3.drawActivePaths(true);
-              _this3.patchPaintStack(path);
+              _this3._patchPaintStack(path);
             }, 16);
             break;
         }
@@ -193,7 +193,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
     }
   }, {
-    key: 'getDressedCursorPosition',
+    key: '_getDressedCursorPosition',
     value: function getDressedCursorPosition(pageX, pageY) {
       var refreshOffset = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
 
@@ -207,7 +207,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       return pos;
     }
   }, {
-    key: 'startPath',
+    key: '_startPath',
     value: function startPath(_ref3) {
       var id = _ref3.id;
       var x = _ref3.x;
@@ -219,15 +219,15 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
         pressureSensitive: !!force, // 0 => false, undefined => false, 0.20 => true
         data: []
       };
-      this.appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
+      this._appendPathPoint({ id: id, x: x, y: y, force: force, tilt: tilt });
     }
   }, {
-    key: 'getActivePath',
+    key: '_getActivePath',
     value: function getActivePath(id) {
       return this._activePaths[id];
     }
   }, {
-    key: 'appendPathPoint',
+    key: '_appendPathPoint',
     value: function appendPathPoint(_ref4) {
       var id = _ref4.id;
       var x = _ref4.x;
@@ -235,13 +235,13 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       var force = _ref4.force;
       var tilt = _ref4.tilt;
 
-      var path = this.getActivePath(id);
+      var path = this._getActivePath(id);
       if (!path) return;
       if (!path.pressureSensitive) force = 1;
       path.data.push({ x: x, y: y, force: force, tilt: tilt });
     }
   }, {
-    key: 'completePath',
+    key: '_completePath',
     value: function completePath(_ref5) {
       var id = _ref5.id;
 
@@ -251,7 +251,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       return path;
     }
   }, {
-    key: 'patchPaintStack',
+    key: '_patchPaintStack',
     value: function patchPaintStack(newPath) {
       var save = arguments.length <= 1 || arguments[1] === undefined ? true : arguments[1];
 

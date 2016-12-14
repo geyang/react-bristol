@@ -141,7 +141,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       this._throttledDraw();
     }
   }, {
-    key: 'startPath',
+    key: '_startPath',
     value: function startDrawing(_ref) {
       var id = _ref.id;
       var x = _ref.x;
@@ -152,7 +152,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       this._activePaths[id] = [{ x: x, y: y, force: force, tilt: tilt }];
     }
   }, {
-    key: 'appendPathPoint',
+    key: '_appendPathPoint',
     value: function appendDrawing(_ref2) {
       var id = _ref2.id;
       var x = _ref2.x;
@@ -164,7 +164,7 @@ var HappySandwichMaker = (_class = (_temp = _class2 = function (_Component) {
       this._activePaths[id].push({ x: x, y: y, force: force, tilt: tilt });
     }
   }, {
-    key: 'completePath',
+    key: '_completePath',
     value: function endDrawing(_ref3) {
       var _this2 = this;
 

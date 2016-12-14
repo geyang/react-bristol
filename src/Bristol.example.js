@@ -8,11 +8,8 @@ const style = {
 };
 export default class HappySandwichMakerExample extends Component {
   @autobind
-  saveImage(image) {
-    // do something with image
-  }
-
-  onChange(vectorData, diff) {
+  onChange(vectorData, operation) {
+    console.log(vectorData, operation);
   }
   /** API plans:
    * 1. enable background image
@@ -31,7 +28,6 @@ export default class HappySandwichMakerExample extends Component {
                interpolation={false}
                backgroundImage={null}
                onChange={this.onChange}
-               onImageUpdate={this.saveImage}
       />
     );
   }
