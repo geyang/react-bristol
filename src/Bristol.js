@@ -41,6 +41,7 @@ export default class Bristol extends Component {
     this._instantiatePalette(this.props.palette)
   }
 
+
   get data() {
     return this._paintStack;
   }
@@ -57,9 +58,19 @@ export default class Bristol extends Component {
       this._instantiatePalette(palette)
     }
     if (data !== this.props.data && data !== this._paintStack) {
+      console.log('now clear and redraw!');
       this._paintStack = data;
-      this._drawPaintStack()
+      this._drawPaintStack(false)
     }
+  }
+
+  shouldComponentUpdate({pen, palette, data}, newState) {
+    // a conservative
+    if (data !== this.props.data && data !== this._paintStack) {
+      console.log('now update the component!');
+      return true;
+    }
+    return false;
   }
 
   _instantiatePalette(palette) {
@@ -132,10 +143,12 @@ export default class Bristol extends Component {
       case 'touchend':
         ({x, y} = this._getDressedCursorPosition(pageX, pageY));
         const path = this._completePath({id});
+        this._patchPaintStack(path);
+        this._clearActive();
         setTimeout(() => {
-          this._drawActivePaths(true);
-          this._patchPaintStack(path);
-        }, 16);
+          const {onChange} = this.props;
+          if (onChange) onChange(this._paintStack, path);
+        }, 0);
         break;
     }
   }
@@ -170,7 +183,7 @@ export default class Bristol extends Component {
     this._activePaths[id] = newPath;
     if (this._isPressureSensitive(force)) {
       newPath.data.forces = [];
-      newPath.data.tiltes = [];
+      newPath.data.tilts = [];
       this._appendPathPoint({id, config, x, y, force, tilt});
     } else {
       this._appendPathPoint({id, config, x, y});
@@ -207,27 +220,37 @@ export default class Bristol extends Component {
     return path;
   }
 
+  _clearActive() {
+    this.active.clear();
+  }
+
   draw(context, path, options) {
     this._palette[path.config.type].draw(context, path, options);
   }
 
   _patchPaintStack(newPath) {
     this.draw(this.inactive.context, newPath);
-    const {onChange} = this.props;
-    if (onChange) onChange(this._paintStack, newPath);
   }
 
-  _drawPaintStack() {
-    this.inactive.clear();
-    this._paintStack.forEach(
-      (data) => {
-        console.log(data);
-        this.draw(this.inactive.context, data);
+  _drawPaintStack(adaptive = true) {
+    if (adaptive && this._oldPaintStack) {
+      this._paintStack.forEach((path, ind) => {
+        if (this._oldPaintStack[ind] !== path) {
+          console.log('draw');
+          this.draw(this.inactive.context, path);
+        }
       });
+    } else {
+      this.inactive.clear();
+      this._paintStack.forEach((path) => {
+        console.log('draw brute force');
+        this.draw(this.inactive.context, path);
+      });
+    }
+    this._oldPaintStack = this._paintStack;
   }
 
-  _drawActivePaths(clearFirst = false) {
-    if (clearFirst) this.active.clear();
+  _drawActivePaths() {
     for (let key in this._activePaths) {
       const activePath = this._activePaths[key];
       this.draw(this.active.context, activePath, {active: true})

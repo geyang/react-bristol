@@ -15,15 +15,15 @@ export default class SimplePen {
   config(configuration) {
     if (!configuration) throw Error("configuration options is " + (typeof configuration));
     if (configuration.type !== SimplePen.type) throw Error('configuration is for a different pen ' + configuration.type);
-    if (configuration) this.options = configuration
+    if (configuration) this._config = configuration
   }
 
   _getWidth(force) {
-    return this.options.strokeWidth * Math.max(Math.min(1.5, force / 0.065), FLOOR);
+    return this._config.strokeWidth * Math.max(Math.min(1.5, force / 0.065), FLOOR);
   }
 
   _getColor(force) {
-    return Color(this.options.color).alpha(Math.max(force / 0.0125, 0.5)).hslaString();
+    return Color(this._config.color).alpha(Math.max(force / 0.0125, 0.5)).hslaString();
   }
 
   draw(context, {config, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {
@@ -47,8 +47,8 @@ export default class SimplePen {
         xs = [xs[0] - halfWidth, xs[0] + halfWidth];
         ys = [ys[0] - halfWidth, ys[0] + halfWidth];
         if (configs) configs = [configs[0], configs[0]];
-        if (tilts) tilts = [tilts[0], tilts[0]];
         if (forces) forces = [forces[0], forces[0]];
+        if (tilts) tilts = [tilts[0], tilts[0]];
       }
     }
 
