@@ -219,7 +219,7 @@ export default class Bristol extends Component {
   _completePath({id}) {
     let path = this._compressPath(this._activePaths[id]);
     this._paintStack.push(path);
-    return this._removePath({id});
+    this._removePath({id});
     return path;
   }
 
@@ -231,8 +231,9 @@ export default class Bristol extends Component {
     this.active.clear();
   }
 
-  draw(context, path, options) {
-    this._palette[path.config.type].draw(context, path, options);
+  draw(context, path, options = {}) {
+    context.renderRatio = this.props.renderRatio;
+    this._palette[path.config.type].draw(context, path, {...options});
   }
 
   _patchPaintStack(newPath) {
@@ -243,14 +244,12 @@ export default class Bristol extends Component {
     if (adaptive && this._oldPaintStack) {
       this._paintStack.forEach((path, ind) => {
         if (this._oldPaintStack[ind] !== path) {
-          console.log('draw');
           this.draw(this.inactive.context, path);
         }
       });
     } else {
       this.inactive.clear();
       this._paintStack.forEach((path) => {
-        console.log('draw brute force');
         this.draw(this.inactive.context, path);
       });
     }

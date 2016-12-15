@@ -1,20 +1,19 @@
 /** Created by ge on 9/12/16. */
-import Color from 'color';
 const FLOOR = 0.5;
 const DEFAULT_FORCE = 0.5;
-export default class SimplePen {
-  static type = "SimplePen";
+export default class Eraser {
+  static type = "Eraser";
 
   constructor(config) {
     if (config) {
-      const {type, color, strokeWidth = 1} = config;
-      this.config({type, color, strokeWidth});
+      const {type, alpha, strokeWidth = 1} = config;
+      this.config({type, alpha, strokeWidth});
     }
   }
 
   config(configuration) {
     if (!configuration) throw Error("configuration options is " + (typeof configuration));
-    if (configuration.type !== SimplePen.type) throw Error('configuration is for a different pen ' + configuration.type);
+    if (configuration.type !== Eraser.type) throw Error('configuration is for a different pen ' + configuration.type);
     if (configuration) this._config = configuration
   }
 
@@ -23,7 +22,7 @@ export default class SimplePen {
   }
 
   _getColor(force) {
-    return Color(this._config.color).alpha(Math.max(force / 0.0125, 0.5)).hslaString();
+    return `rgba(255, 255, 255, ${Math.max(force / 0.0125, 0.25)})`;
   }
 
   draw(context, {config, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {
@@ -32,10 +31,11 @@ export default class SimplePen {
 
     const oldComposition = context.globalCompositeOperation;
     // kind of a dicey implementation.
-    context.globalCompositeOperation = "source-over";
+    context.globalCompositeOperation = options.active ? "source-over" : "destination-out";
 
     context.beginPath();
-    context.lineCap = 'butt';
+    context.lineCap = 'round';
+    console.log('context.lineCap', context.lineCap);
 
     if (options.active) {
       xs = xs.slice(-2);
@@ -44,11 +44,11 @@ export default class SimplePen {
       if (forces) forces = forces.slice(-2);
       if (tilts) tilts = tilts.slice(-2);
     } else {
-      context.lineCap = 'butt';
+      // // context.lineCap = 'butt';
       // context.lineCap = 'round';
       if (xs.length == 1) {
 
-        let halfWidth = this._getWidth(forces ? forces[0] : DEFAULT_FORCE, renderRatio) / 4;
+        let halfWidth = this._getWidth(forces ? forces[0] : DEFAULT_FORCE, renderRatio) / 10;
         xs = [xs[0] - halfWidth, xs[0] + halfWidth];
         ys = [ys[0] - halfWidth, ys[0] + halfWidth];
         if (configs) configs = [configs[0], configs[0]];
