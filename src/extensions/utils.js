@@ -6,10 +6,10 @@ export function sigmoid(x) {
 }
 
 export function rangedSigmoid(floor, ceiling, x) {
-  return floor + (ceiling - floor) * (1 + Math.exp(-x));
+  return floor + (ceiling - floor) / (1 + Math.exp(-x));
 }
 
 export function rangedTaper(floor, ceiling, x) {
   "use strict";
-  return floor + (ceiling - floor) * (2 * (1 + Math.exp(-x)) - 1);
+  return floor + (ceiling - floor) * (2 / (1 + Math.exp(-x)) - 1);
 }
