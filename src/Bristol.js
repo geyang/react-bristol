@@ -139,6 +139,9 @@ export default class Bristol extends Component {
         this._appendPathPoint({id, config, x, y, force, tilt});
         this._drawActivePaths();
         break;
+      case 'touchcancel':
+        this._removePath({id});
+        break;
       case 'mouseup':
       case 'touchend':
         ({x, y} = this._getDressedCursorPosition(pageX, pageY));
@@ -216,6 +219,10 @@ export default class Bristol extends Component {
   _completePath({id}) {
     let path = this._compressPath(this._activePaths[id]);
     this._paintStack.push(path);
+    return this._removePath({id});
+  }
+
+  _removePath({id}) {
     delete this._activePaths[id];
     return path;
   }
