@@ -1,6 +1,8 @@
 /** Created by ge on 9/12/16. */
 import Color from 'color';
+import {rangedTaper} from "./utils";
 const FLOOR = 0.5;
+const CEILING = 1.;
 const DEFAULT_FORCE = 0.5;
 export default class SimplePen {
   static type = "SimplePen";
@@ -19,7 +21,7 @@ export default class SimplePen {
   }
 
   _getWidth(force, renderRatio) {
-    return this._config.strokeWidth * renderRatio * Math.max(Math.min(1.5, force / 0.065), FLOOR);
+    return this._config.strokeWidth * renderRatio * rangedTaper(FLOOR, CEILING, force);
   }
 
   _getColor(force) {

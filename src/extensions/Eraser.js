@@ -1,5 +1,7 @@
 /** Created by ge on 9/12/16. */
-const FLOOR = 0.5;
+import {rangedTaper} from "./utils";
+const FLOOR = 0.2;
+const CEILING = 1.5;
 const DEFAULT_FORCE = 0.5;
 export default class Eraser {
   static type = "Eraser";
@@ -18,7 +20,7 @@ export default class Eraser {
   }
 
   _getWidth(force, renderRatio) {
-    return this._config.strokeWidth * renderRatio * Math.max(Math.min(1.5, force / 0.065), FLOOR);
+    return this._config.strokeWidth * renderRatio * rangedTaper(FLOOR, CEILING, force);
   }
 
   _getColor(force) {
