@@ -220,11 +220,11 @@ export default class Bristol extends Component {
     let path = this._compressPath(this._activePaths[id]);
     this._paintStack.push(path);
     return this._removePath({id});
+    return path;
   }
 
   _removePath({id}) {
     delete this._activePaths[id];
-    return path;
   }
 
   _clearActive() {
