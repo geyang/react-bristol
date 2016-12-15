@@ -24,7 +24,7 @@ export default class Eraser {
   }
 
   _getColor(force) {
-    return `rgba(255, 255, 255, ${Math.max(force / 0.0125, 0.25)})`;
+    return `rgba(255, 255, 255, ${rangedTaper(0.0, 1.0, force)})`;
   }
 
   draw(context, {config, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {
