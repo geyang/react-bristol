@@ -1,30 +1,40 @@
 /** Created by ge on 9/12/16. */
 import {rangedTaper} from "./utils";
-const FLOOR = 0.2;
-const CEILING = 1.5;
 const DEFAULT_FORCE = 0.5;
 export default class Eraser {
   static type = "Eraser";
 
   constructor(config) {
-    if (config) {
-      const {type, alpha, strokeWidth = 1} = config;
-      this.config({type, alpha, strokeWidth});
-    }
+    if (config) this.config = config;
   }
 
-  config(configuration) {
+  set config(configuration) {
+    const {
+      type, alpha, strokeWidth = 1,
+      strokeFloor = 0.6, strokeCeiling = 1.5, strokeScale = 10,
+      alphaFloor = 0.4, alphaCeiling = 1.0, alphaScale = 10,
+    } = configuration;
     if (!configuration) throw Error("configuration options is " + (typeof configuration));
     if (configuration.type !== Eraser.type) throw Error('configuration is for a different pen ' + configuration.type);
-    if (configuration) this._config = configuration
+    this._config = {
+      type, alpha, strokeWidth,
+      strokeFloor, strokeCeiling, strokeScale,
+      alphaFloor, alphaCeiling, alphaScale,
+    };
+  }
+
+  get config() {
+    return this._config
   }
 
   _getWidth(force, renderRatio) {
-    return this._config.strokeWidth * renderRatio * rangedTaper(FLOOR, CEILING, force);
+    return this.config.strokeWidth * renderRatio * rangedTaper(
+        this.config.strokeFloor, this.config.strokeCeiling, this.config.strokeScale,
+        force);
   }
 
   _getColor(force) {
-    return `rgba(255, 255, 255, ${rangedTaper(0.0, 1.0, force)})`;
+    return `rgba(255, 255, 255, ${rangedTaper(this.config.alphaFloor, this.config.alphaCeiling, this.config.alphaScale, force)})`;
   }
 
   draw(context, {config, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {
@@ -37,7 +47,6 @@ export default class Eraser {
 
     context.beginPath();
     context.lineCap = 'round';
-    console.log('context.lineCap', context.lineCap);
 
     if (options.active) {
       xs = xs.slice(-2);
@@ -59,13 +68,13 @@ export default class Eraser {
       }
     }
 
-    this.config(config);
+    this.config = config;
     context.moveTo(xs[0], ys[0]);
     // default force is no force information is available from the path.
     let force = DEFAULT_FORCE;
     for (let i = 1; i < xs.length; i++) {
       // reconfig the pen, in case the config changes.
-      if (configs) this.config(configs[i]);
+      if (configs) this.config = configs[i];
       if (forces) force = forces[i];
       context.lineWidth = this._getWidth(force, renderRatio);
       context.strokeStyle = this._getColor(force);

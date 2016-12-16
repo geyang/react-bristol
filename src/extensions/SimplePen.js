@@ -1,31 +1,41 @@
 /** Created by ge on 9/12/16. */
 import Color from 'color';
 import {rangedTaper} from "./utils";
-const FLOOR = 0.5;
-const CEILING = 1.;
 const DEFAULT_FORCE = 0.5;
 export default class SimplePen {
   static type = "SimplePen";
 
   constructor(config) {
-    if (config) {
-      const {type, color, strokeWidth = 1} = config;
-      this.config({type, color, strokeWidth});
-    }
+    if (config) this.config = config;
   }
 
-  config(configuration) {
+  set config(configuration) {
+    const {
+      type, color, strokeWidth = 1,
+      strokeFloor = 0.5, strokeCeiling = 1, strokeScale = 10,
+      alphaFloor = 0.2, alphaCeiling = 1.5, alphaScale = 10,
+    } = configuration;
     if (!configuration) throw Error("configuration options is " + (typeof configuration));
     if (configuration.type !== SimplePen.type) throw Error('configuration is for a different pen ' + configuration.type);
-    if (configuration) this._config = configuration
+    this._config = {
+      type, color, strokeWidth,
+      strokeFloor, strokeCeiling, strokeScale,
+      alphaFloor, alphaCeiling, alphaScale,
+    };
+  }
+
+  get config() {
+    return this._config
   }
 
   _getWidth(force, renderRatio) {
-    return this._config.strokeWidth * renderRatio * rangedTaper(FLOOR, CEILING, force);
+    return this.config.strokeWidth * renderRatio * rangedTaper(
+        this.config.strokeFloor, this.config.strokeCeiling, this.config.strokeScale,
+        force);
   }
 
   _getColor(force) {
-    return Color(this._config.color).alpha(Math.max(force / 0.0125, 0.5)).hslaString();
+    return Color(this.config.color).alpha(rangedTaper(this.config.alphaFloor, this.config.alphaCeiling, this.config.alphaScale, force)).hslaString();
   }
 
   draw(context, {config, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {
@@ -59,13 +69,13 @@ export default class SimplePen {
       }
     }
 
-    this.config(config);
+    this.config = config;
     context.moveTo(xs[0], ys[0]);
     // default force is no force information is available from the path.
     let force = DEFAULT_FORCE;
     for (let i = 1; i < xs.length; i++) {
       // reconfig the pen, in case the config changes.
-      if (configs) this.config(configs[i]);
+      if (configs) this.config = configs[i];
       if (forces) force = forces[i];
       context.lineWidth = this._getWidth(force, renderRatio);
       context.strokeStyle = this._getColor(force);

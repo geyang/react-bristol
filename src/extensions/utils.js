@@ -5,11 +5,15 @@ export function sigmoid(x) {
   return 1 / (1 + Math.exp(-x));
 }
 
-export function rangedSigmoid(floor, ceiling, x) {
-  return floor + (ceiling - floor) / (1 + Math.exp(-x));
+export function rangedSigmoid(floor, ceiling, scale = 1, x) {
+  return floor + (ceiling - floor) / (1 + Math.exp(-x * scale));
 }
 
-export function rangedTaper(floor, ceiling, x) {
+export function limit(min, max, n) {
+  return Math.max(min, Math.min(max, n));
+}
+
+export function rangedTaper(floor, ceiling, scale = 1, x) {
   "use strict";
-  return floor + (ceiling - floor) * (2 / (1 + Math.exp(-x)) - 1);
+  return limit(0, 1, floor + (ceiling - floor) * (2 / (1 + Math.exp(-x * scale)) - 1));
 }
