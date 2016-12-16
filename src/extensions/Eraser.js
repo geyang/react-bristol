@@ -1,5 +1,5 @@
 /** Created by ge on 9/12/16. */
-import {rangedTaper} from "./utils";
+import {limit, rangedTaper} from "./utils";
 const DEFAULT_FORCE = 0.5;
 export default class Eraser {
   static type = "Eraser";
@@ -34,7 +34,7 @@ export default class Eraser {
   }
 
   _getColor(force) {
-    return `rgba(255, 255, 255, ${rangedTaper(this.config.alphaFloor, this.config.alphaCeiling, this.config.alphaScale, force)})`;
+    return `rgba(255, 255, 255, ${limit(0, 1, rangedTaper(this.config.alphaFloor, this.config.alphaCeiling, this.config.alphaScale, force))})`;
   }
 
   draw(context, {config, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {

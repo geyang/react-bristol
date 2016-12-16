@@ -1,6 +1,6 @@
 /** Created by ge on 9/12/16. */
 import Color from 'color';
-import {rangedTaper} from "./utils";
+import {limit, rangedTaper} from "./utils";
 const DEFAULT_FORCE = 0.5;
 export default class SimplePen {
   static type = "SimplePen";
@@ -35,7 +35,7 @@ export default class SimplePen {
   }
 
   _getColor(force) {
-    return Color(this.config.color).alpha(rangedTaper(this.config.alphaFloor, this.config.alphaCeiling, this.config.alphaScale, force)).hslaString();
+    return Color(this.config.color).alpha(limit(0, 1, rangedTaper(this.config.alphaFloor, this.config.alphaCeiling, this.config.alphaScale, force))).hslaString();
   }
 
   draw(context, {config, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {
