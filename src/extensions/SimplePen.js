@@ -12,8 +12,8 @@ export default class SimplePen {
   set config(configuration) {
     const {
       type, color, strokeWidth = 1,
-      strokeFloor = 0.5, strokeCeiling = 1, strokeScale = 10,
-      alphaFloor = 0.2, alphaCeiling = 1.5, alphaScale = 10,
+      strokeFloor = 0.9, strokeCeiling = 2, strokeScale = 3,
+      alphaFloor = 0.9, alphaCeiling = 2, alphaScale = 3,
     } = configuration;
     if (!configuration) throw Error("configuration options is " + (typeof configuration));
     if (configuration.type !== SimplePen.type) throw Error('configuration is for a different pen ' + configuration.type);
@@ -49,6 +49,7 @@ export default class SimplePen {
     context.beginPath();
     context.lineCap = 'butt';
 
+    this.config = config;
     if (options.active) {
       xs = xs.slice(-2);
       ys = ys.slice(-2);
@@ -69,7 +70,6 @@ export default class SimplePen {
       }
     }
 
-    this.config = config;
     context.moveTo(xs[0], ys[0]);
     // default force is no force information is available from the path.
     let force = DEFAULT_FORCE;

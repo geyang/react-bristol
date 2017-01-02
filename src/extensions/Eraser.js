@@ -48,6 +48,7 @@ export default class Eraser {
     context.beginPath();
     context.lineCap = 'round';
 
+    this.config = config;
     if (options.active) {
       xs = xs.slice(-2);
       ys = ys.slice(-2);
@@ -68,7 +69,6 @@ export default class Eraser {
       }
     }
 
-    this.config = config;
     context.moveTo(xs[0], ys[0]);
     // default force is no force information is available from the path.
     let force = DEFAULT_FORCE;

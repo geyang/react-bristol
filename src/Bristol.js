@@ -8,7 +8,7 @@ import Canvas from './Canvas';
 
 const ALLOWED_MODES = ['png', 'ink'];
 
-const {number, func, bool, object, array, oneOf, any} = PropTypes;
+const {number, func, bool, string, object, array, oneOf, oneOfType, any} = PropTypes;
 /**
  * description of the component
  */
@@ -24,7 +24,7 @@ export default class Bristol extends Component {
     pen: object.isRequired,
     palette: any.isRequired,
     /** todo: use correct type for image */
-    data: array,
+    data: oneOfType([array, string]),
     image: any,
     backgroundImage: any,
     interpolation: bool
@@ -37,7 +37,16 @@ export default class Bristol extends Component {
 
   componentWillMount() {
     this._activePaths = {};
-    this._paintStack = this.props.data || [];
+    if (typeof this.props.data == "string") {
+      try {
+        this._paintStack = JSON.parse(this.props.data)
+      } catch (e) {
+        console.warn(e);
+        this._paintStack = [];
+      }
+    } else {
+      this._paintStack = this.props.data || [];
+    }
     this._instantiatePalette(this.props.palette)
   }
 
@@ -49,7 +58,16 @@ export default class Bristol extends Component {
   componentDidMount() {
     this.active = this.refs['active'];
     this.inactive = this.refs['inactive'];
-    this._drawPaintStack();
+    try {
+      this._drawPaintStack();
+    } catch (e) {
+      console.error(e);
+      // this.props.dispatch({
+      //   type: "NOTICE_ERROR",
+      //   errorType: "mounting_error",
+      //   error: e
+      // })
+    }
     // this.active.putImage()
   }
 
@@ -64,13 +82,11 @@ export default class Bristol extends Component {
     }
   }
 
-  shouldComponentUpdate({pen, palette, data}, newState) {
+  shouldComponentUpdate({pen, palette, width, height, data}, newState) {
     // a conservative
-    if (data !== this.props.data && data !== this._paintStack) {
-      console.log('now update the component!');
-      return true;
-    }
-    return false;
+    return (data !== this.props.data && data !== this._paintStack) ||
+      this.props.height !== height ||
+      this.props.width !== width;
   }
 
   _instantiatePalette(palette) {
@@ -265,6 +281,7 @@ export default class Bristol extends Component {
 
   render() {
     const {width, height, renderRatio, onChange, pen, palette, data, image, backgroundImage, interpolation, scale, offset, style, ..._props} = this.props;
+    console.log('==============>', width, height);
     const canvasStyle = {
       position: 'absolute',
       top: 0, left: 0,
