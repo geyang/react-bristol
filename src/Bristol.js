@@ -259,6 +259,8 @@ export default class Bristol extends Component {
   }
 
   _drawPaintStack(adaptive = true) {
+    if (!this._paintStack || !this._paintStack.forEach)
+      return console.warn("_paintStack is ill-formed: ", this._paintStack);
     if (adaptive && this._oldPaintStack) {
       this._paintStack.forEach((path, ind) => {
         if (this._oldPaintStack[ind] !== path) {
