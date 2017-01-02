@@ -59,7 +59,7 @@ export default class Bristol extends Component {
     this.active = this.refs['active'];
     this.inactive = this.refs['inactive'];
     try {
-      this._drawPaintStack();
+      this._drawPaintStack(false);
     } catch (e) {
       console.error(e);
       // this.props.dispatch({
@@ -71,14 +71,17 @@ export default class Bristol extends Component {
     // this.active.putImage()
   }
 
-  componentWillReceiveProps({pen, palette, data}) {
+  componentWillReceiveProps({width, height, pen, palette, data}) {
     if (this.props.palette !== palette) {
       this._instantiatePalette(palette)
     }
-    if (data !== this.props.data && data !== this._paintStack) {
-      console.log('now clear and redraw!');
-      this._paintStack = data;
-      this._drawPaintStack(false)
+    if (width !== this.props.width ||
+      height !== this.props.height ||
+      (data !== this.props.data && data !== this._paintStack)) {
+      setTimeout(() => {
+        this._paintStack = data;
+        this._drawPaintStack(false)
+      }, 0);
     }
   }
 
@@ -138,7 +141,6 @@ export default class Bristol extends Component {
     }
   }
 
-
   _recordTouch({eventType, id, config, pageX, pageY, force, tilt}) {
     let x, y;
     switch (eventType) {
@@ -186,7 +188,7 @@ export default class Bristol extends Component {
     return pos;
   }
 
-  _isPressureSensitive(force) {
+  static _isPressureSensitive(force) {
     return !!force; // 0 => false, undefined => false, 0.20 => true
   }
 
@@ -200,7 +202,7 @@ export default class Bristol extends Component {
       }
     };
     this._activePaths[id] = newPath;
-    if (this._isPressureSensitive(force)) {
+    if (Bristol._isPressureSensitive(force)) {
       newPath.data.forces = [];
       newPath.data.tilts = [];
       this._appendPathPoint({id, config, x, y, force, tilt});
@@ -226,14 +228,14 @@ export default class Bristol extends Component {
     }
   }
 
-  _compressPath({config, _configDirty, data}) {
+  static _compressPath({config, _configDirty, data}) {
     // remove data config field is all config are the same
     if (!_configDirty) delete data.configs;
     return {config, data};
   }
 
   _completePath({id}) {
-    let path = this._compressPath(this._activePaths[id]);
+    let path = Bristol._compressPath(this._activePaths[id]);
     this._paintStack = this._paintStack.concat(path);
     this._removePath({id});
     return path;
@@ -264,6 +266,7 @@ export default class Bristol extends Component {
         }
       });
     } else {
+      //note: always clear, to prevent bugs with semi-transparent colors.
       this.inactive.clear();
       this._paintStack.forEach((path) => {
         this.draw(this.inactive.context, path);
@@ -281,7 +284,6 @@ export default class Bristol extends Component {
 
   render() {
     const {width, height, renderRatio, onChange, pen, palette, data, image, backgroundImage, interpolation, scale, offset, style, ..._props} = this.props;
-    console.log('==============>', width, height);
     const canvasStyle = {
       position: 'absolute',
       top: 0, left: 0,
