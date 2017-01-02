@@ -216,13 +216,13 @@ export default class Bristol extends Component {
   _appendPathPoint({id, config, x, y, force, tilt}) {
     const path = this._getActivePath(id);
     if (!path) return;
-    path.data.xs.push(x);
-    path.data.ys.push(y);
-    path.data.configs.push(config);
+    path.data.xs = path.data.xs.concat(x);
+    path.data.ys = path.data.ys.concat(y);
+    path.data.configs = path.data.configs.concat(config);
     if (config !== path.config) path._configDirty = true;
     if (path.data.forces) {
-      path.data.forces.push(force);
-      path.data.tilts.push(tilt);
+      path.data.forces = path.data.forces.concat(force);
+      path.data.tilts = path.data.tilts.concat(tilt);
     }
   }
 
@@ -234,7 +234,7 @@ export default class Bristol extends Component {
 
   _completePath({id}) {
     let path = this._compressPath(this._activePaths[id]);
-    this._paintStack.push(path);
+    this._paintStack = this._paintStack.concat(path);
     this._removePath({id});
     return path;
   }
