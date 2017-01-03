@@ -42,6 +42,7 @@ export default class Bristol extends Component {
         this._paintStack = JSON.parse(this.props.data)
       } catch (e) {
         console.warn(e);
+        //todo: this is questionable decision
         this._paintStack = [];
       }
     } else {
@@ -252,13 +253,16 @@ export default class Bristol extends Component {
     console.log('3. complete path', this._activePaths[id]);
     let compressedPath = Bristol._compressPath(this._activePaths[id]);
     if (!compressedPath) console.warn(`compressed path has ${compressedPath} value`);
-    else this._paintStack = this._paintStack.concat(compressedPath);
+    else this._paintStack = (this._paintStack || []).concat(compressedPath);
     this._removePath({id});
     return compressedPath;
   }
 
   _removePath({id}) {
-    delete this._activePaths[id];
+    let newActivePaths = {...this._activePaths};
+    delete newActivePaths[id];
+    console.log(newActivePaths);
+    this._activePaths = newActivePaths;
   }
 
   _clearActive() {
