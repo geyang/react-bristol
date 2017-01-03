@@ -78,6 +78,7 @@ export default class SimplePen {
       if (forces) force -= forces[i];
       if (tilts) tilt -= tilts[i];
 
+      //todo: use more sophisticated drawing algorithm
       context.lineWidth = this._getWidth(force, renderRatio);
       context.strokeStyle = this._getColor(force);
 
@@ -85,11 +86,13 @@ export default class SimplePen {
       x -= xs[i];
       y -= ys[i];
       context.lineTo(x, y);
-      if (i === 0) context.stroke();
-      if (options.active) {
-        context.beginPath();
-        context.moveTo(x, y);
-      }
+      // // todo: this is wrong. It prevents the stroke from having variable width.
+      context.stroke();
+      // if (i === 0) context.stroke();
+      // if (options.active) {
+      context.beginPath();
+      context.moveTo(x, y);
+      // }
     }
     context.globalCompositionOperation = oldComposition;
   }

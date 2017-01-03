@@ -84,11 +84,13 @@ export default class Eraser {
       x -= xs[i];
       y -= ys[i];
       context.lineTo(x, y);
-      if (i === 0) context.stroke();
-      if (options.active) {
-        context.beginPath();
-        context.moveTo(x, y);
-      }
+      // // todo: this is wrong. It prevents the stroke from having variable width.
+      context.stroke();
+      // if (i === 0) context.stroke();
+      // if (options.active) {
+      context.beginPath();
+      context.moveTo(x, y);
+      // }
     }
     context.globalCompositionOperation = oldComposition;
   }
