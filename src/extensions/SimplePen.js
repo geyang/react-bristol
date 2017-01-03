@@ -85,7 +85,7 @@ export default class SimplePen {
       x -= xs[i];
       y -= ys[i];
       context.lineTo(x, y);
-      context.stroke();
+      if (i === 0) context.stroke();
       if (options.active) {
         context.beginPath();
         context.moveTo(x, y);
