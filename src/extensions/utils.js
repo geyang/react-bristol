@@ -14,6 +14,5 @@ export function limit(min, max, n) {
 }
 
 export function rangedTaper(floor, ceiling, scale = 1, x) {
-  "use strict";
   return floor + (ceiling - floor) * (2 / (1 + Math.exp(-x * scale)) - 1);
 }

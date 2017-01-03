@@ -163,12 +163,11 @@ export default class Bristol extends Component {
       case 'mouseup':
       case 'touchend':
         ({x, y} = this._getDressedCursorPosition(pageX, pageY));
-        const path = this._completePath({id});
-        this._patchPaintStack(path);
+        const newPath = this._completePath({id});
+        if (newPath) this._patchPaintStack(newPath);
         this._clearActive();
         setTimeout(() => {
-          const {onChange} = this.props;
-          if (onChange) onChange(this._paintStack, path);
+          if (this.props.onChange) this.props.onChange(this._paintStack, newPath);
         }, 0);
         break;
     }
@@ -195,6 +194,8 @@ export default class Bristol extends Component {
   _startPath({id, config, x, y, force, tilt}) {
     let newPath = {
       config,
+      x,
+      y,
       data: {
         xs: [],
         ys: [],
@@ -202,12 +203,15 @@ export default class Bristol extends Component {
       }
     };
     this._activePaths[id] = newPath;
+    console.log('1. adding path');
     if (Bristol._isPressureSensitive(force)) {
+      newPath.force = force;
+      newPath.tilt = tilt;
       newPath.data.forces = [];
       newPath.data.tilts = [];
-      this._appendPathPoint({id, config, x, y, force, tilt});
+      // this._appendPathPoint({id, config, x, y, force, tilt});
     } else {
-      this._appendPathPoint({id, config, x, y});
+      // this._appendPathPoint({id, config, x, y});
     }
   }
 
@@ -216,29 +220,41 @@ export default class Bristol extends Component {
   }
 
   _appendPathPoint({id, config, x, y, force, tilt}) {
+    console.log('2. append to path');
     const path = this._getActivePath(id);
     if (!path) return;
-    path.data.xs = path.data.xs.concat(x);
-    path.data.ys = path.data.ys.concat(y);
+    path.data.xs = path.data.xs.concat(x - path.x);
+    path.x = x;
+    path.data.ys = path.data.ys.concat(y - path.y);
+    path.y = y;
     path.data.configs = path.data.configs.concat(config);
     if (config !== path.config) path._configDirty = true;
-    if (path.data.forces) {
-      path.data.forces = path.data.forces.concat(force);
-      path.data.tilts = path.data.tilts.concat(tilt);
+    if (typeof force !== "undefined" && typeof path.force !== "undefined") {
+      path.data.forces = path.data.forces.concat(force - path.force);
+      path.force = force
+    }
+    if (typeof tilt !== "undefined" && typeof path.tilt !== "undefined") {
+      path.data.tilts = path.data.tilts.concat(tilt - path.tilt);
+      path.tilt = tilt
     }
   }
 
-  static _compressPath({config, _configDirty, data}) {
+  static _compressPath({x, y, force, tilt, config, _configDirty, data}) {
     // remove data config field is all config are the same
-    if (!_configDirty) delete data.configs;
-    return {config, data};
+    let compressed = {x, y, config, data: {...data}};
+    if (!_configDirty) delete compressed.data.configs;
+    if (force) compressed.force = force;
+    if (tilt) compressed.tilt = tilt;
+    return compressed;
   }
 
   _completePath({id}) {
-    let path = Bristol._compressPath(this._activePaths[id]);
-    this._paintStack = this._paintStack.concat(path);
+    console.log('3. complete path', this._activePaths[id]);
+    let compressedPath = Bristol._compressPath(this._activePaths[id]);
+    if (!compressedPath) console.warn(`compressed path has ${compressedPath} value`);
+    else this._paintStack = this._paintStack.concat(compressedPath);
     this._removePath({id});
-    return path;
+    return compressedPath;
   }
 
   _removePath({id}) {
@@ -250,6 +266,7 @@ export default class Bristol extends Component {
   }
 
   draw(context, path, options = {}) {
+    if (!path) return console.warn('path is not defined. Might be a problem with Bristol component.');
     context.renderRatio = this.props.renderRatio;
     this._palette[path.config.type].draw(context, path, {...options});
   }
@@ -259,6 +276,7 @@ export default class Bristol extends Component {
   }
 
   _drawPaintStack(adaptive = true) {
+    console.log(this._paintStack);
     if (!this._paintStack || !this._paintStack.forEach)
       return console.warn("_paintStack is ill-formed: ", this._paintStack);
     if (adaptive && this._oldPaintStack) {

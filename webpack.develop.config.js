@@ -10,8 +10,8 @@ var hljs = require('highlight.js');
 require('es6-promise').polyfill();
 
 const port = 5000;
-const clientHost = `http://localhost:${port}`;
-// const clientHost = `http://84d15538.ngrok.io`;
+const clientHost = `http://0.0.0.0:${port}`;
+// const clientHost = `https://5844a9fe.ngrok.io`;
 
 const build_entry = {
   app: [

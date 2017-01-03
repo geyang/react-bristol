@@ -2,6 +2,7 @@
 import Color from 'color';
 import {limit, rangedTaper} from "./utils";
 const DEFAULT_FORCE = 0.5;
+const DEFAULT_TILT = 1;
 export default class SimplePen {
   static type = "SimplePen";
 
@@ -38,7 +39,7 @@ export default class SimplePen {
     return Color(this.config.color).alpha(limit(0, 1, rangedTaper(this.config.alphaFloor, this.config.alphaCeiling, this.config.alphaScale, force))).hslaString();
   }
 
-  draw(context, {config, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {
+  draw(context, {config, x, y, force = DEFAULT_FORCE, tilt = DEFAULT_TILT, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {
     if (!xs || xs.length == 0) return;
     const renderRatio = context.renderRatio;
 
@@ -51,39 +52,43 @@ export default class SimplePen {
 
     this.config = config;
     if (options.active) {
-      xs = xs.slice(-2);
-      ys = ys.slice(-2);
-      if (configs) configs = configs.slice(-2);
-      if (forces) forces = forces.slice(-2);
-      if (tilts) tilts = tilts.slice(-2);
+      xs = xs.slice(-1);
+      ys = ys.slice(-1);
+      if (configs) configs = configs.slice(-1);
+      if (forces) forces = forces.slice(-1);
+      if (tilts) tilts = tilts.slice(-1);
     } else {
       context.lineCap = 'butt';
       // context.lineCap = 'round';
       if (xs.length == 1) {
 
         let halfWidth = this._getWidth(forces ? forces[0] : DEFAULT_FORCE, renderRatio) / 4;
-        xs = [xs[0] - halfWidth, xs[0] + halfWidth];
-        ys = [ys[0] - halfWidth, ys[0] + halfWidth];
-        if (configs) configs = [configs[0], configs[0]];
-        if (forces) forces = [forces[0], forces[0]];
-        if (tilts) tilts = [tilts[0], tilts[0]];
+        x = xs[0] - halfWidth, xs = [xs[0] + halfWidth];
+        y = ys[0] - halfWidth, ys = [ys[0] + halfWidth];
+        if (configs) config = configs[0], configs = configs.slice(-1);
+        if (forces) force = forces[0], forces = forces.slice(-1);
+        if (tilts) tilt = tilts[0], tilts = tilts.slice(-1);
       }
     }
 
-    context.moveTo(xs[0], ys[0]);
-    // default force is no force information is available from the path.
-    let force = DEFAULT_FORCE;
-    for (let i = 1; i < xs.length; i++) {
+    for (let i = xs.length - 1; i >= 0; i--) {
+      context.moveTo(x, y);
       // reconfig the pen, in case the config changes.
       if (configs) this.config = configs[i];
-      if (forces) force = forces[i];
+      if (forces) force -= forces[i];
+      if (tilts) tilt -= tilts[i];
+
       context.lineWidth = this._getWidth(force, renderRatio);
       context.strokeStyle = this._getColor(force);
-      context.lineTo(xs[i], ys[i]);
+
+      // now finish the stroke
+      x -= xs[i];
+      y -= ys[i];
+      context.lineTo(x, y);
       context.stroke();
-      if (!options.active) {
+      if (options.active) {
         context.beginPath();
-        context.moveTo(xs[i], ys[i]);
+        context.moveTo(x, y);
       }
     }
     context.globalCompositionOperation = oldComposition;
