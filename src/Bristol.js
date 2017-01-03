@@ -159,7 +159,7 @@ export default class Bristol extends Component {
         this._drawActivePaths();
         break;
       case 'touchcancel':
-        this._removePath({id});
+        this._removeActivePath({id});
         break;
       case 'mouseup':
       case 'touchend':
@@ -221,7 +221,7 @@ export default class Bristol extends Component {
   }
 
   _appendPathPoint({id, config, x, y, force, tilt}) {
-    console.log('2. append to path');
+    console.log('2. append to path', force);
     const path = this._getActivePath(id);
     if (!path) return;
     path.data.xs = path.data.xs.concat(x - path.x);
@@ -242,10 +242,10 @@ export default class Bristol extends Component {
 
   static _compressPath({x, y, force, tilt, config, _configDirty, data}) {
     // remove data config field is all config are the same
-    let compressed = {x, y, config, data: {...data}};
-    if (!_configDirty) delete compressed.data.configs;
-    if (force) compressed.force = force;
-    if (tilt) compressed.tilt = tilt;
+    let compressed = {x, y, config, data: {xs: data.xs, ys: data.ys}};
+    if (_configDirty) compressed.data.configs = data.configs;
+    if (typeof force !== "undefined") compressed.force = force, compressed.data.forces = data.forces;
+    if (typeof tilt !== "undefined") compressed.tilt = tilt, compressed.data.tilts = data.tilts;
     return compressed;
   }
 
@@ -254,11 +254,11 @@ export default class Bristol extends Component {
     let compressedPath = Bristol._compressPath(this._activePaths[id]);
     if (!compressedPath) console.warn(`compressed path has ${compressedPath} value`);
     else this._paintStack = (this._paintStack || []).concat(compressedPath);
-    this._removePath({id});
+    this._removeActivePath({id});
     return compressedPath;
   }
 
-  _removePath({id}) {
+  _removeActivePath({id}) {
     let newActivePaths = {...this._activePaths};
     delete newActivePaths[id];
     console.log(newActivePaths);

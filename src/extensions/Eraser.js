@@ -39,6 +39,7 @@ export default class Eraser {
   }
 
   draw(context, {config, x, y, force = DEFAULT_FORCE, tilt = DEFAULT_TILT, data:{xs, ys, configs, forces, tilts}}, options = {active: false}) {
+
     if (!xs || xs.length == 0) return;
     const renderRatio = context.renderRatio;
 
@@ -86,11 +87,7 @@ export default class Eraser {
       context.lineTo(x, y);
       // // todo: this is wrong. It prevents the stroke from having variable width.
       context.stroke();
-      // if (i === 0) context.stroke();
-      // if (options.active) {
       context.beginPath();
-      context.moveTo(x, y);
-      // }
     }
     context.globalCompositionOperation = oldComposition;
   }
