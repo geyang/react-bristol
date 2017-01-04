@@ -49,7 +49,7 @@ export default class SimplePen {
     context.globalCompositeOperation = "source-over";
 
     context.beginPath();
-    context.lineCap = 'butt';
+    context.lineCap = 'round';
 
     this.config = config;
     if (options.active) {
@@ -59,8 +59,8 @@ export default class SimplePen {
       if (forces) forces = forces.slice(-1);
       if (tilts) tilts = tilts.slice(-1);
     } else {
-      context.lineCap = 'butt';
-      // context.lineCap = 'round';
+      // context.lineCap = 'butt';
+      context.lineCap = 'round';
       if (xs.length == 1) {
 
         let halfWidth = this._getWidth(forces ? forces[0] : DEFAULT_FORCE, renderRatio) / 4;
