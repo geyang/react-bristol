@@ -72,7 +72,6 @@ export default class Eraser {
     }
 
     for (let i = xs.length - 1; i >= 0; i--) {
-      context.moveTo(x, y);
       // reconfig the pen, in case the config changes.
       if (configs) this.config = configs[i];
       if (forces) force -= forces[i];
@@ -81,11 +80,12 @@ export default class Eraser {
       context.lineWidth = this._getWidth(force, renderRatio);
       context.strokeStyle = this._getColor(force);
 
+      context.moveTo(x, y);
       // now finish the stroke
       x -= xs[i];
       y -= ys[i];
       context.lineTo(x, y);
-      // // todo: this is wrong. It prevents the stroke from having variable width.
+      //resolved: this is needed for the stroke to have variable width.
       context.stroke();
       context.beginPath();
     }
