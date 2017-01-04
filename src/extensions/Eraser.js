@@ -80,6 +80,7 @@ export default class Eraser {
       context.lineWidth = this._getWidth(force, renderRatio);
       context.strokeStyle = this._getColor(force);
 
+      context.beginPath();
       context.moveTo(x, y);
       // now finish the stroke
       x -= xs[i];
@@ -87,7 +88,7 @@ export default class Eraser {
       context.lineTo(x, y);
       //resolved: this is needed for the stroke to have variable width.
       context.stroke();
-      context.beginPath();
+      context.closePath();
     }
     context.globalCompositionOperation = oldComposition;
   }
