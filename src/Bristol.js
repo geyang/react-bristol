@@ -1,10 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {autobind} from "core-decorators";
 import Canvas from './Canvas';
-// import DotTest from './extensions/dotTest';
-// const pen = DotTest({color: '#003bff'});
-// import CalligraphyPen from './extensions/calligraphyPen';
-// const pen = CalligraphyPen({color: 'blue', strokeWidth: 10, angle: -45, epsilon: 0.1, blur: 1});
 
 const ALLOWED_MODES = ['png', 'ink'];
 
@@ -279,7 +275,6 @@ export default class Bristol extends Component {
   }
 
   _drawPaintStack(adaptive = true) {
-    console.log(this._paintStack);
     if (!this._paintStack || !this._paintStack.forEach)
       return console.warn("_paintStack is ill-formed: ", this._paintStack);
     if (adaptive && this._oldPaintStack) {
