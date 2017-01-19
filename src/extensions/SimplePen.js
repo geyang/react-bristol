@@ -1,6 +1,8 @@
 /** Created by ge on 9/12/16. */
 import Color from 'color';
 import {limit, rangedTaper} from "./utils";
+export const STROKE_WIDTHS = [0.1, 0.2, 0.3, 0.5, 0.7, 1,
+  2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30, 35];
 const DEFAULT_FORCE = 0.5;
 const DEFAULT_TILT = 1;
 export default class SimplePen {

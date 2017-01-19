@@ -2,27 +2,31 @@
 import React, {Component, PropTypes} from 'react';
 import {findDOMNode} from 'react-dom';
 
-const {number, bool} = PropTypes;
+const {number, bool, string, func} = PropTypes;
 export default class Canvas extends Component {
   static propTypes = {
     width: number,
     height: number,
-    interpolation: bool
+    interpolation: bool,
+    backgroundColor: string,
+    afterRender: func,
   };
 
   static defaultProps = {
     interpolation: true
   };
 
-  componentDidMount() {
-    this.getContext();
-  }
-
-  componentWillReceiveProps({width, height}) {
+  componentWillReceiveProps({backgroundColor, width, height}) {
+    let changed;
     if (width !== this.props.width || height !== this.props.height) {
       this.getContext();
-      this._cachedImage = this.getImageData();
+      changed = true;
     }
+    if (backgroundColor !== this.props.backgroundColor) {
+      this.setBackgroundColor(backgroundColor);
+      changed = true;
+    }
+    if (changed) this._cachedImage = this.getImageData();
   }
 
   getContext() {
@@ -30,7 +34,7 @@ export default class Canvas extends Component {
     this.context = this.nativeElement.getContext('2d');
   }
 
-  shouldComponentUpdate({width, height}) {
+  shouldComponentUpdate({width, height, backgroundColor}) {
     return (width !== this.props.width || height !== this.props.height);
   }
 
@@ -67,7 +71,13 @@ export default class Canvas extends Component {
   }
 
   putImage(image, x = 0, y = 0) {
-    this.context.putImageData(image, x, y)
+    this.context.putImageData(image, x, y);
+  }
+
+  setBackgroundColor(color) {
+    if (!color) return;
+    this.context.fillStyle = color;
+    this.context.fillRect(0, 0, 10000, 10000);
   }
 
   toDataURL(type, options) {
@@ -75,11 +85,14 @@ export default class Canvas extends Component {
   }
 
   onRerenderCanvas(element) {
+    this.getContext();
+    if (this.props.backgroundColor) this.setBackgroundColor(this.props.backgroundColor);
+    if (this.props.afterRender) this.props.afterRender(this.context);
     if (this._cachedImage) this.putImage(this._cachedImage);
   }
 
   render() {
-    const {interpolation, style, ..._props} = this.props;
+    const {interpolation, style, backgroundColor, afterRender, ..._props} = this.props;
     const _style = interpolation ? style : {
         imageRendering: 'optimizeSpeed',
         // imageRendering: '-moz-crisp-edges',

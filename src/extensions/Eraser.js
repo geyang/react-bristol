@@ -1,5 +1,8 @@
 /** Created by ge on 9/12/16. */
 import {limit, rangedTaper} from "./utils";
+
+export const STROKE_WIDTHS = [0.5, 1, 2, 4, 8, 12, 16, 20, 25, 30, 35, 40, 80, 120, 200];
+
 const DEFAULT_FORCE = 0.5;
 const DEFAULT_TILT = 0.5;
 export default class Eraser {

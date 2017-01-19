@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import autobind from 'autobind-decorator';
+import {autobind} from "core-decorators";
 import Canvas from './Canvas';
 // import DotTest from './extensions/dotTest';
 // const pen = DotTest({color: '#003bff'});
@@ -27,12 +27,14 @@ export default class Bristol extends Component {
     data: oneOfType([array, string]),
     image: any,
     backgroundImage: any,
+    backgroundColor: string,
     interpolation: bool
   };
 
   static defaultProps = {
     renderRatio: 3,
-    interpolation: true
+    interpolation: true,
+    backgroundColor: "#f6f2e5"
   };
 
   componentWillMount() {
@@ -57,8 +59,6 @@ export default class Bristol extends Component {
   }
 
   componentDidMount() {
-    this.active = this.refs['active'];
-    this.inactive = this.refs['inactive'];
     try {
       this._drawPaintStack(false);
     } catch (e) {
@@ -69,10 +69,9 @@ export default class Bristol extends Component {
       //   error: e
       // })
     }
-    // this.active.putImage()
   }
 
-  componentWillReceiveProps({width, height, pen, palette, data}) {
+  componentWillReceiveProps({width, height, pen, palette, data, backgroundColor}) {
     if (this.props.palette !== palette) {
       this._instantiatePalette(palette)
     }
@@ -306,8 +305,37 @@ export default class Bristol extends Component {
     }
   }
 
+  // todo: move this to somewhere else. Make more flexible and modular.
+  @autobind
+  _drawBackground(context) {
+    // this.background is still undefined at this point.
+    let margin = 10;
+    let spacing = 30 * this.props.renderRatio;
+    let width = this.props.width * this.props.renderRatio;
+    let height = this.props.height * this.props.renderRatio;
+    context.strokeStyle = "#e0dcd1";
+    context.strokeWidth = 4.5 * this.props.renderRatio;
+    for (let i = 1; i < 100; i++) {
+      context.beginPath();
+      context.moveTo(margin, i * spacing);
+      context.lineTo(width - margin, i * spacing);
+      context.stroke();
+      context.closePath();
+
+      context.beginPath();
+      context.moveTo(i * spacing, margin);
+      context.lineTo(i * spacing, height - margin);
+      context.stroke();
+      context.closePath();
+    }
+  }
+
   render() {
-    const {width, height, renderRatio, onChange, pen, palette, data, image, backgroundImage, interpolation, scale, offset, style, ..._props} = this.props;
+    const {
+      width, height, renderRatio, onChange, pen, palette, data, image,
+      backgroundImage, backgroundColor,
+      interpolation, scale, offset, style, ..._props
+    } = this.props;
     const canvasStyle = {
       position: 'absolute',
       top: 0, left: 0,
@@ -317,7 +345,7 @@ export default class Bristol extends Component {
     };
     return (
       <div style={{width, height, position: 'relative', ...style}}>
-        <Canvas ref="active"
+        <Canvas ref={(e) => this.active = e}
                 style={canvasStyle}
                 width={width * renderRatio}
           // always interpolate for otherwise won't show on mobile safari.
@@ -331,17 +359,20 @@ export default class Bristol extends Component {
                 onTouchCancel={this.genericHandler}
                 interpolation={false}
                 {..._props}/>
-        <Canvas ref="inactive"
+        <Canvas ref={(e) => this.inactive = e}
                 style={{...canvasStyle, zIndex: -1}}
                 width={width * renderRatio}
                 height={height * renderRatio}
                 interpolation={interpolation}
                 {..._props}/>
-        {backgroundImage ? <Canvas ref="background-image"
-                                   style={{...canvasStyle, zIndex: -2}}
-                                   width={width * renderRatio}
-                                   height={height * renderRatio}
-                                   interpolation={interpolation}/> : null}
+        {backgroundImage || backgroundColor ?
+          <Canvas ref={(e) => this.background = e}
+                  backgroundColor={backgroundColor}
+                  afterRender={this._drawBackground}
+                  style={{...canvasStyle, zIndex: -2}}
+                  width={width * renderRatio}
+                  height={height * renderRatio}
+                  interpolation={interpolation}/> : null}
       </div>
     );
   }
